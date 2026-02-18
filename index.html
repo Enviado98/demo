@@ -1,29 +1,45 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INK STUDIO — Tattoo & Body Art</title>
-<meta name="description" content="Estudio de tatuajes profesional. Arte permanente desde 1998. Cita previa.">
+<title>INK STUDIO | Arte Permanente</title>
+<meta name="description" content="Estudio de tatuajes premium. Artistas expertos, higiene clínica y diseños personalizados.">
+
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- GSAP & Lenis (El motor de las animaciones profesionales) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
+
+<!-- Fuentes -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+<!-- Iconos -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <script>
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: { sans: ['Inter','system-ui','-apple-system','sans-serif'] },
+        fontFamily: {
+          sans: ['Space Grotesk', 'sans-serif'],
+          display: ['Syne', 'sans-serif'],
+        },
         colors: {
-          'ink': '#0e0e0e',
-          'ink-mid': '#3a3a3a',
-          'ink-muted': '#86868B',
-          'ink-faint': '#c7c7cc',
-          'surface': '#F5F5F7',
-          'surface-2': '#EBEBF0',
-          'red': '#FF3B30',
-          'green': '#34C759',
+          'void': '#050505',      /* Negro profundo */
+          'card': '#121212',      /* Gris muy oscuro */
+          'border': '#262626',    /* Bordes sutiles */
+          'accent': '#E1E1E1',    /* Blanco hueso */
+          'muted': '#888888',     /* Texto secundario */
+          'red': '#FF3333',       /* Acento de error/importante */
+        },
+        backgroundImage: {
+            'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         }
       }
     }
@@ -31,959 +47,648 @@
 </script>
 
 <style>
-  *,-webkit-font-smoothing:antialiased;
-  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-
-  body { background: #ffffff; color: #0e0e0e; overflow-x: hidden; }
-
-  /* ── GLASS ── */
-  .glass {
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border: 1px solid rgba(255,255,255,0.45);
+  /* ── BASE & RESET ── */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
+  
+  body { 
+    background-color: #050505; 
+    color: #E1E1E1; 
+    overflow-x: hidden;
+    cursor: default;
   }
-  .glass-dark {
-    background: rgba(14,14,14,0.82);
-    backdrop-filter: saturate(180%) blur(24px);
-    -webkit-backdrop-filter: saturate(180%) blur(24px);
+
+  /* ── CANVAS BACKGROUND ── */
+  #bg-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; opacity: 0.4; pointer-events: none;
+  }
+
+  /* ── TYPOGRAPHY UTILS ── */
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(255,255,255,0.15);
+    color: transparent;
+  }
+
+  /* ── UI COMPONENTS ── */
+  .glass-panel {
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255,255,255,0.08);
   }
 
-  /* ── CARD ── */
-  .card {
-    background: #fff;
-    border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    transition: all 0.4s cubic-bezier(.16,1,.3,1);
+  .interactive-card {
+    background: #0f0f0f;
+    border: 1px solid #1f1f1f;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.09);
-    border-color: rgba(0,0,0,0.1);
+  .interactive-card:hover {
+    border-color: #333;
+    transform: translateY(-4px);
+    background: #141414;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
   }
+  
+  /* Quiz Selection State */
+  .interactive-card.selected {
+    background: #E1E1E1;
+    color: #050505;
+    border-color: #E1E1E1;
+  }
+  .interactive-card.selected p, 
+  .interactive-card.selected span,
+  .interactive-card.selected i { color: #050505 !important; }
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeInUp {
-    from { opacity:0; transform:translateY(32px) scale(.97); }
-    to   { opacity:1; transform:translateY(0) scale(1); }
-  }
-  @keyframes fadeIn {
-    from { opacity:0; } to { opacity:1; }
-  }
-  @keyframes scaleIn {
-    from { opacity:0; transform:scale(.92); }
-    to   { opacity:1; transform:scale(1); }
-  }
-  @keyframes popIn {
-    0%   { transform:scale(0) rotate(-10deg); }
-    70%  { transform:scale(1.12) rotate(2deg); }
-    100% { transform:scale(1) rotate(0); }
-  }
-  @keyframes shimmerMove {
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(100%); }
-  }
-  @keyframes float {
-    0%,100% { transform:translateY(0); }
-    50%     { transform:translateY(-10px); }
-  }
-  @keyframes barGrow {
-    from { width:0; } to { width:100%; }
-  }
-  @keyframes pulseDot {
-    0%,100% { opacity:1; } 50% { opacity:.3; }
-  }
-  @keyframes slideUp {
-    from { opacity:0; transform:translateY(20px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-
-  .anim-fade    { opacity:0; animation: fadeInUp .7s cubic-bezier(.16,1,.3,1) forwards; }
-  .anim-scale   { opacity:0; animation: scaleIn  .6s cubic-bezier(.16,1,.3,1) forwards; }
-  .anim-slide   { opacity:0; animation: slideUp  .5s cubic-bezier(.16,1,.3,1) forwards; }
-
-  .d1{animation-delay:.08s} .d2{animation-delay:.16s} .d3{animation-delay:.24s}
-  .d4{animation-delay:.32s} .d5{animation-delay:.40s} .d6{animation-delay:.48s}
-
-  .paused { animation-play-state: paused; }
-  .running { animation-play-state: running !important; }
-
-  /* ── PILL / BADGE ── */
-  .pill {
-    background: rgba(0,0,0,0.05);
-    backdrop-filter: blur(10px);
-    border-radius: 100px;
-    border: 1px solid rgba(0,0,0,0.07);
-  }
-
-  /* ── BTN ── */
-  .btn-black {
-    background: #0e0e0e;
-    color: #fff;
-    border-radius: 980px;
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: #E1E1E1;
+    color: #050505;
     font-weight: 600;
-    transition: all .3s cubic-bezier(.16,1,.3,1);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-  }
-  .btn-black:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 32px rgba(0,0,0,0.25); }
-  .btn-black:active { transform:scale(.97); }
-
-  .btn-ghost {
-    background: rgba(0,0,0,0.05);
-    color: #0e0e0e;
-    border-radius: 980px;
-    font-weight: 600;
-    transition: all .3s cubic-bezier(.16,1,.3,1);
-  }
-  .btn-ghost:hover { background:rgba(0,0,0,0.09); transform:translateY(-1px); }
-
-  .btn-red {
-    background: linear-gradient(180deg,#FF4F43 0%,#D93025 100%);
-    color: #fff; border-radius:980px; font-weight:600;
-    transition: all .3s cubic-bezier(.16,1,.3,1);
-    box-shadow: 0 4px 16px rgba(255,59,48,.25);
-  }
-  .btn-red:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 28px rgba(255,59,48,.35); }
-
-  /* ── QUIZ CARDS ── */
-  .qcard {
-    border: 1.5px solid rgba(0,0,0,0.08);
-    border-radius: 18px;
-    background: #fff;
-    cursor: pointer;
-    transition: all .35s cubic-bezier(.16,1,.3,1);
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .qcard:hover {
-    border-color: #0e0e0e;
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 16px 40px rgba(0,0,0,.1);
-  }
-  .qcard:active { transform:scale(.97); }
-  .qcard.chosen {
-    border-color: #0e0e0e;
-    background: #0e0e0e;
-    color: #fff;
-    box-shadow: 0 12px 36px rgba(0,0,0,.2);
-  }
-  .qcard.chosen svg path,
-  .qcard.chosen svg rect,
-  .qcard.chosen svg circle,
-  .qcard.chosen svg ellipse,
-  .qcard.chosen svg line { fill:#fff!important; stroke:#fff!important; }
-  .qcard.chosen .qcard-sub { color:rgba(255,255,255,.5)!important; }
-
-  /* ── PROGRESS BAR ── */
-  .qprog-track { height:2px; background:rgba(0,0,0,.08); border-radius:1px; overflow:hidden; }
-  .qprog-fill  { height:100%; background:#0e0e0e; border-radius:1px; transition:width .6s cubic-bezier(.16,1,.3,1); }
-
-  /* ── SHIMMER ── */
-  .shimmer-wrap { position:relative; overflow:hidden; }
-  .shimmer-wrap::after {
-    content:'';
-    position:absolute; inset:0;
-    background: linear-gradient(90deg,transparent 0%,rgba(255,255,255,.7) 50%,transparent 100%);
-    animation: shimmerMove 2.4s ease infinite;
-  }
-
-  /* ── NAV SCROLLED ── */
-  .nav-scrolled {
-    background: rgba(255,255,255,.82) !important;
-    backdrop-filter: saturate(180%) blur(20px) !important;
-    -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
-    border-bottom: 1px solid rgba(0,0,0,.06);
-    box-shadow: 0 1px 0 rgba(0,0,0,.04);
-  }
-
-  /* ── GALLERY ── */
-  .gitem {
-    background: #F5F5F7;
-    border-radius: 18px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all .4s cubic-bezier(.16,1,.3,1);
-    border: 1px solid rgba(0,0,0,.05);
+    transition: all 0.3s ease;
     position: relative;
+    overflow: hidden;
   }
-  .gitem:hover { transform:scale(1.03); box-shadow:0 20px 50px rgba(0,0,0,.12); }
-  .gitem:hover .gitem-label { opacity:1; transform:translateY(0); }
-  .gitem-label {
-    position:absolute; bottom:0; left:0; right:0;
-    background: rgba(14,14,14,.75);
-    backdrop-filter: blur(12px);
-    color:#fff; padding:.7rem 1rem;
-    font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
-    opacity:0; transform:translateY(8px);
-    transition: all .35s cubic-bezier(.16,1,.3,1);
+  .btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
   }
 
-  /* ── CARE CARD ── */
-  .care-card-hover:hover { border-color:#0e0e0e!important; box-shadow:0 12px 32px rgba(0,0,0,.08); }
-
-  /* ── FAQ ── */
-  .faq-body { max-height:0; overflow:hidden; transition:max-height .5s cubic-bezier(.16,1,.3,1), padding .4s; }
-  .faq-open .faq-body { max-height:200px; padding-bottom:1.2rem; }
-  .faq-icon { transition: transform .4s cubic-bezier(.16,1,.3,1); }
-  .faq-open .faq-icon { transform:rotate(45deg); }
-
-  /* ── SPLASH ── */
-  #splash { transition: opacity .9s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1); }
-  #splash.out { opacity:0; transform:scale(1.05); pointer-events:none; }
-
-  /* ── SCROLL SECTIONS ── */
-  .reveal { opacity:0; transform:translateY(28px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
-  .reveal.vis { opacity:1; transform:none; }
-
-  /* ── TOAST ── */
-  #toast { transition: opacity .5s cubic-bezier(.16,1,.3,1), transform .5s cubic-bezier(.16,1,.3,1); }
-
-  /* ── FLOAT ── */
-  .float { animation: float 4s ease-in-out infinite; }
-
-  /* ── GRADIENT BG ── */
-  .gradient-bg {
-    background:
-      radial-gradient(at 20% 20%, rgba(0,0,0,.02) 0, transparent 60%),
-      radial-gradient(at 80% 80%, rgba(0,0,0,.015) 0, transparent 60%),
-      #fff;
+  .btn-outline {
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #E1E1E1;
+    transition: all 0.3s ease;
   }
+  .btn-outline:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: #E1E1E1;
+  }
+
+  /* ── UTILITIES ── */
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  
+  /* Progress Bar for Quiz */
+  .progress-bar-bg { background: #1f1f1f; height: 2px; width: 100%; border-radius: 2px; }
+  .progress-bar-fill { background: #E1E1E1; height: 100%; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+
 </style>
 </head>
 <body class="antialiased">
 
+<!-- CANVAS FONDO (Partículas flotantes) -->
+<canvas id="bg-canvas"></canvas>
+
 <!-- ══════════════════════════════════════
-     SPLASH SCREEN
+     SPLASH SCREEN (Intro)
 ══════════════════════════════════════ -->
-<div id="splash" class="fixed inset-0 z-[10000] bg-ink flex flex-col items-center justify-center overflow-hidden">
-  <!-- subtle grid lines -->
-  <div class="absolute inset-0 opacity-[0.03]"
-       style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;"></div>
-
-  <p id="splashGreet" class="text-white/40 text-xs font-medium tracking-[.45em] uppercase mb-6 anim-fade" style="font-family:'Inter',sans-serif">
-    Bienvenido
-  </p>
-  <h1 class="text-white font-black text-[clamp(4rem,20vw,10rem)] leading-[.88] tracking-tight text-center anim-fade d1">
-    INK<br>STUDIO
-  </h1>
-  <p class="text-white/35 text-sm font-light tracking-[.12em] mt-4 anim-fade d3">
-    Tattoo &amp; Body Art
-  </p>
-
-  <!-- progress bar -->
-  <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10 overflow-hidden">
-    <div class="h-full bg-white" style="animation:barGrow 2.4s ease forwards;"></div>
+<div id="splash" class="fixed inset-0 z-[9999] bg-void flex flex-col items-center justify-center">
+  <div class="overflow-hidden">
+    <h1 class="font-display font-bold text-[15vw] leading-[0.8] text-accent tracking-tighter opacity-0 translate-y-20" id="splash-title">
+      INK STUDIO
+    </h1>
+  </div>
+  <div class="mt-6 overflow-hidden">
+    <p class="font-sans text-sm tracking-[0.5em] text-muted uppercase opacity-0 translate-y-10" id="splash-sub">
+      Arte Permanente
+    </p>
+  </div>
+  
+  <!-- Loading Line -->
+  <div class="absolute bottom-0 left-0 w-full h-[1px] bg-white/10">
+    <div id="splash-bar" class="h-full bg-white w-0"></div>
   </div>
 </div>
 
-
 <!-- ══════════════════════════════════════
-     QUIZ FLOW
+     QUIZ (Onboarding)
 ══════════════════════════════════════ -->
-<div id="quiz" class="fixed inset-0 z-[9000] bg-white flex items-center justify-center p-6
-     opacity-0 pointer-events-none transition-opacity duration-500">
+<div id="quiz-container" class="fixed inset-0 z-[9000] bg-void/95 backdrop-blur-xl flex items-center justify-center p-6 opacity-0 pointer-events-none">
+  
+  <!-- Botón de Escape (UX Improvement) -->
+  <button onclick="skipQuiz()" class="absolute top-6 right-6 text-xs text-muted hover:text-white uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full transition-colors z-50">
+    Saltar Intro ✕
+  </button>
 
-  <div class="w-full max-w-[660px]" id="quizInner">
-
-    <!-- Step 0 — First time? -->
-    <div class="quiz-step hidden" id="qs0">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 1 de 4</p>
-      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:25%"></div></div>
-      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
-        ¿Es tu<br>primera vez?
-      </h2>
-      <p class="text-ink-muted text-base font-light mb-8">Así te damos la mejor guía posible</p>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="qcard p-7 flex flex-col items-center gap-2 anim-slide" data-q="0" data-v="first" onclick="selectOpt(this,0)">
-          <span class="text-4xl font-black">Sí</span>
-          <span class="qcard-sub text-xs text-ink-muted font-medium tracking-widest uppercase">Primera vez</span>
-        </div>
-        <div class="qcard p-7 flex flex-col items-center gap-2 anim-slide d1" data-q="0" data-v="returning" onclick="selectOpt(this,0)">
-          <span class="text-4xl font-black">No</span>
-          <span class="qcard-sub text-xs text-ink-muted font-medium tracking-widest uppercase">Ya tengo tattoos</span>
-        </div>
+  <div class="w-full max-w-2xl relative">
+    
+    <!-- Step 1: Experiencia -->
+    <div class="quiz-step relative" id="step-1">
+      <div class="mb-8">
+        <span class="text-xs font-mono text-muted">01 / 03</span>
+        <div class="progress-bar-bg mt-2"><div class="progress-bar-fill w-[33%]"></div></div>
       </div>
-      <div class="mt-7 flex justify-end">
-        <button id="qnext0" onclick="nextStep(1)"
-          class="btn-black px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300"
-          data-btn="0">Continuar →</button>
-      </div>
-    </div>
-
-    <!-- Step 1 — Body part -->
-    <div class="quiz-step hidden" id="qs1">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 2 de 4</p>
-      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:50%"></div></div>
-      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
-        ¿Dónde<br>lo quieres?
-      </h2>
-      <p class="text-ink-muted text-base font-light mb-8">Selecciona la zona del cuerpo</p>
-      <div class="grid grid-cols-3 gap-3">
-
-        <!-- Cabeza -->
-        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="cabeza" onclick="selectOpt(this,1)" style="animation-delay:.05s">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <ellipse cx="22" cy="17" rx="11" ry="13" fill="#0e0e0e"/>
-            <rect x="17" y="29" width="10" height="6" rx="3" fill="#0e0e0e"/>
-            <circle cx="18" cy="15" r="1.8" fill="#fff"/>
-            <circle cx="26" cy="15" r="1.8" fill="#fff"/>
-          </svg>
-          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Cabeza</span>
+      
+      <h2 class="font-display text-4xl md:text-6xl font-bold mb-4">¿Tu primera vez?</h2>
+      <p class="text-muted text-lg mb-10">Queremos asignarte el artista adecuado para tu experiencia.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div onclick="selectOption(1, 'first', this)" class="interactive-card p-8 rounded-xl cursor-pointer group">
+          <i class="ph-fill ph-sparkle text-3xl mb-4 text-muted group-hover:text-white transition-colors"></i>
+          <h3 class="text-2xl font-bold mb-1">Sí, es el primero</h3>
+          <p class="text-sm text-muted">Busco guía y paciencia.</p>
         </div>
-
-        <!-- Cuello -->
-        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="cuello" onclick="selectOpt(this,1)" style="animation-delay:.10s">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <ellipse cx="22" cy="12" rx="8" ry="9" fill="#0e0e0e"/>
-            <rect x="17" y="20" width="10" height="15" rx="4" fill="#0e0e0e"/>
-          </svg>
-          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Cuello</span>
+        <div onclick="selectOption(1, 'experienced', this)" class="interactive-card p-8 rounded-xl cursor-pointer group">
+          <i class="ph-fill ph-infinity text-3xl mb-4 text-muted group-hover:text-white transition-colors"></i>
+          <h3 class="text-2xl font-bold mb-1">No, ya tengo tinta</h3>
+          <p class="text-sm text-muted">Busco calidad y técnica.</p>
         </div>
-
-        <!-- Torso -->
-        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="torso" onclick="selectOpt(this,1)" style="animation-delay:.15s">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <ellipse cx="22" cy="7" rx="7" ry="5" fill="#0e0e0e"/>
-            <rect x="11" y="10" width="22" height="26" rx="5" fill="#0e0e0e"/>
-            <line x1="22" y1="10" x2="22" y2="36" stroke="#fff" stroke-width="1.5"/>
-            <line x1="11" y1="21" x2="33" y2="21" stroke="#fff" stroke-width="1.2"/>
-          </svg>
-          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Torso</span>
-        </div>
-
-        <!-- Brazo -->
-        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="brazo" onclick="selectOpt(this,1)" style="animation-delay:.20s">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <rect x="17" y="4" width="10" height="36" rx="5" fill="#0e0e0e"/>
-            <ellipse cx="22" cy="40" rx="5" ry="3.5" fill="#0e0e0e"/>
-          </svg>
-          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Brazo</span>
-        </div>
-
-        <!-- Pierna -->
-        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="pierna" onclick="selectOpt(this,1)" style="animation-delay:.25s">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <rect x="15" y="4" width="14" height="20" rx="4" fill="#0e0e0e"/>
-            <rect x="15" y="22" width="6" height="18" rx="3" fill="#0e0e0e"/>
-            <rect x="23" y="22" width="6" height="18" rx="3" fill="#0e0e0e"/>
-          </svg>
-          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Pierna</span>
-        </div>
-
-        <!-- Espalda -->
-        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="espalda" onclick="selectOpt(this,1)" style="animation-delay:.30s">
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <ellipse cx="22" cy="7" rx="7" ry="5" fill="#0e0e0e"/>
-            <rect x="11" y="10" width="22" height="26" rx="5" fill="#0e0e0e"/>
-            <line x1="11" y1="20" x2="33" y2="20" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2"/>
-            <line x1="11" y1="28" x2="33" y2="28" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2"/>
-          </svg>
-          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Espalda</span>
-        </div>
-
-      </div>
-      <div class="mt-7 flex justify-end">
-        <button id="qnext1" onclick="nextStep(2)"
-          class="btn-black px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300">Continuar →</button>
       </div>
     </div>
 
-    <!-- Step 2 — Style -->
-    <div class="quiz-step hidden" id="qs2">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 3 de 4</p>
-      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:75%"></div></div>
-      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
-        ¿Qué<br>estilo?
-      </h2>
-      <p class="text-ink-muted text-base font-light mb-8">Tu estética define el diseño</p>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="qcard p-6 anim-slide" data-q="2" data-v="realismo" onclick="selectOpt(this,2)" style="animation-delay:.05s">
-          <p class="font-black text-xl mb-1">Realismo</p>
-          <p class="qcard-sub text-xs text-ink-muted font-medium">Hyper detallado</p>
-        </div>
-        <div class="qcard p-6 anim-slide" data-q="2" data-v="oldschool" onclick="selectOpt(this,2)" style="animation-delay:.1s">
-          <p class="font-black text-xl mb-1">Old School</p>
-          <p class="qcard-sub text-xs text-ink-muted font-medium">Clásico &amp; atemporal</p>
-        </div>
-        <div class="qcard p-6 anim-slide" data-q="2" data-v="blackwork" onclick="selectOpt(this,2)" style="animation-delay:.15s">
-          <p class="font-black text-xl mb-1">Blackwork</p>
-          <p class="qcard-sub text-xs text-ink-muted font-medium">Líneas puras</p>
-        </div>
-        <div class="qcard p-6 anim-slide" data-q="2" data-v="geometrico" onclick="selectOpt(this,2)" style="animation-delay:.2s">
-          <p class="font-black text-xl mb-1">Geométrico</p>
-          <p class="qcard-sub text-xs text-ink-muted font-medium">Formas precisas</p>
-        </div>
+    <!-- Step 2: Estilo -->
+    <div class="quiz-step absolute top-0 left-0 w-full opacity-0 pointer-events-none translate-y-10" id="step-2">
+      <div class="mb-8">
+        <span class="text-xs font-mono text-muted">02 / 03</span>
+        <div class="progress-bar-bg mt-2"><div class="progress-bar-fill w-[66%]"></div></div>
       </div>
-      <div class="mt-7 flex justify-end">
-        <button id="qnext2" onclick="nextStep(3)"
-          class="btn-black px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300">Continuar →</button>
+      
+      <h2 class="font-display text-4xl md:text-6xl font-bold mb-4">El Estilo</h2>
+      <p class="text-muted text-lg mb-10">¿Qué estética visual te atrae más?</p>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div onclick="selectOption(2, 'realism', this)" class="interactive-card p-6 rounded-xl cursor-pointer">
+          <span class="text-lg font-bold">Realismo</span>
+        </div>
+        <div onclick="selectOption(2, 'blackwork', this)" class="interactive-card p-6 rounded-xl cursor-pointer">
+          <span class="text-lg font-bold">Blackwork</span>
+        </div>
+        <div onclick="selectOption(2, 'fine-line', this)" class="interactive-card p-6 rounded-xl cursor-pointer">
+          <span class="text-lg font-bold">Línea Fina</span>
+        </div>
+        <div onclick="selectOption(2, 'traditional', this)" class="interactive-card p-6 rounded-xl cursor-pointer">
+          <span class="text-lg font-bold">Tradicional</span>
+        </div>
       </div>
     </div>
 
-    <!-- Step 3 — Size -->
-    <div class="quiz-step hidden" id="qs3">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 4 de 4</p>
-      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:100%"></div></div>
-      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
-        ¿Qué<br>tamaño?
-      </h2>
-      <p class="text-ink-muted text-base font-light mb-8">Afecta el precio y el tiempo de sesión</p>
-      <div class="grid grid-cols-3 gap-3">
-        <div class="qcard p-6 flex flex-col items-center gap-3 anim-slide" data-q="3" data-v="pequeno" onclick="selectOpt(this,3)" style="animation-delay:.05s">
-          <div class="w-8 h-8 rounded-full bg-ink-faint"></div>
-          <p class="font-black text-base">Pequeño</p>
-          <p class="qcard-sub text-[.68rem] text-ink-muted">5 – 10 cm</p>
+    <!-- Step 3: Tamaño -->
+    <div class="quiz-step absolute top-0 left-0 w-full opacity-0 pointer-events-none translate-y-10" id="step-3">
+      <div class="mb-8">
+        <span class="text-xs font-mono text-muted">03 / 03</span>
+        <div class="progress-bar-bg mt-2"><div class="progress-bar-fill w-[100%]"></div></div>
+      </div>
+      
+      <h2 class="font-display text-4xl md:text-6xl font-bold mb-4">Dimensiones</h2>
+      <p class="text-muted text-lg mb-10">Esto define el tiempo de la sesión.</p>
+      
+      <div class="grid grid-cols-3 gap-4">
+        <div onclick="finishQuiz('small')" class="interactive-card p-6 rounded-xl cursor-pointer text-center hover:bg-white hover:text-black">
+          <div class="w-8 h-8 rounded-full border border-current mx-auto mb-4"></div>
+          <span class="font-bold">Pequeño</span>
+          <p class="text-[10px] opacity-60 mt-1">&lt; 5cm</p>
         </div>
-        <div class="qcard p-6 flex flex-col items-center gap-3 anim-slide" data-q="3" data-v="mediano" onclick="selectOpt(this,3)" style="animation-delay:.1s">
-          <div class="w-12 h-12 rounded-full bg-ink-faint"></div>
-          <p class="font-black text-base">Mediano</p>
-          <p class="qcard-sub text-[.68rem] text-ink-muted">10 – 20 cm</p>
+        <div onclick="finishQuiz('medium')" class="interactive-card p-6 rounded-xl cursor-pointer text-center hover:bg-white hover:text-black">
+          <div class="w-12 h-12 rounded-full border border-current mx-auto mb-4"></div>
+          <span class="font-bold">Mediano</span>
+          <p class="text-[10px] opacity-60 mt-1">5 - 15cm</p>
         </div>
-        <div class="qcard p-6 flex flex-col items-center gap-3 anim-slide" data-q="3" data-v="grande" onclick="selectOpt(this,3)" style="animation-delay:.15s">
-          <div class="w-16 h-16 rounded-full bg-ink-faint"></div>
-          <p class="font-black text-base">Grande</p>
-          <p class="qcard-sub text-[.68rem] text-ink-muted">+20 cm</p>
+        <div onclick="finishQuiz('large')" class="interactive-card p-6 rounded-xl cursor-pointer text-center hover:bg-white hover:text-black">
+          <div class="w-16 h-16 rounded-full border border-current mx-auto mb-4"></div>
+          <span class="font-bold">Grande</span>
+          <p class="text-[10px] opacity-60 mt-1">&gt; 15cm</p>
         </div>
       </div>
-      <div class="mt-7 flex justify-end">
-        <button id="qnext3" onclick="showResult()"
-          class="btn-red px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300">Ver mi perfil →</button>
-      </div>
-    </div>
-
-    <!-- Result -->
-    <div class="quiz-step hidden text-center" id="quizResult">
-      <div class="w-16 h-16 rounded-full bg-ink mx-auto flex items-center justify-center mb-6"
-           style="animation:popIn .5s cubic-bezier(.16,1,.3,1) both">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <polyline points="5,14 11,20 23,8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 id="resultTitle" class="font-black text-4xl tracking-tight mb-3">Todo listo.</h2>
-      <p id="resultSub" class="text-ink-muted font-light text-base leading-relaxed mb-6 max-w-sm mx-auto"></p>
-      <div id="resultTags" class="flex flex-wrap gap-2 justify-center mb-8"></div>
-      <button onclick="enterApp()" class="btn-black px-10 py-3.5 text-sm">Explorar el estudio →</button>
     </div>
 
   </div>
 </div>
 
-
 <!-- ══════════════════════════════════════
-     MAIN APP
+     MAIN WEBSITE
 ══════════════════════════════════════ -->
-<div id="app" class="opacity-0 transition-opacity duration-700">
+<div id="main-site" class="relative opacity-0">
 
-  <!-- NAV -->
-  <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
-    <div class="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
-      <a href="#" class="font-black text-lg tracking-tight text-ink">INK STUDIO</a>
-      <div id="navStatus" class="flex items-center gap-2 pill px-4 py-1.5">
-        <div id="navDot" class="w-2 h-2 rounded-full bg-green" style="animation:pulseDot 2s infinite"></div>
-        <span id="navStatusText" class="text-xs font-medium tracking-wide">Abierto</span>
-      </div>
+  <!-- NAVBAR FLOTANTE -->
+  <nav class="fixed top-0 w-full z-40 px-6 py-6 flex justify-between items-center mix-blend-difference">
+    <a href="#" class="font-display font-bold text-xl tracking-tighter">INK STUDIO.</a>
+    
+    <div class="hidden md:flex gap-8 text-sm font-medium tracking-wide">
+      <a href="#gallery" class="hover:text-muted transition-colors">Galería</a>
+      <a href="#process" class="hover:text-muted transition-colors">Proceso</a>
+      <a href="#faq" class="hover:text-muted transition-colors">FAQ</a>
     </div>
+
+    <a href="#contact" class="px-5 py-2 border border-white rounded-full text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all font-bold">
+      Reservar
+    </a>
   </nav>
 
-  <!-- ── HERO ── -->
-  <section class="min-h-screen flex items-end pb-20 pt-32 px-6 gradient-bg relative overflow-hidden">
-    <!-- big bg word -->
-    <div class="absolute bottom-0 right-0 font-black text-[clamp(8rem,28vw,22rem)] leading-none tracking-tight
-                text-black/[.03] pointer-events-none select-none pr-4">
-      TATTOO
+  <!-- HERO SECTION -->
+  <section class="relative min-h-screen flex items-center px-6 md:px-20 pt-20 overflow-hidden">
+    <!-- Texto Grande de Fondo -->
+    <div class="absolute right-[-10%] top-[20%] text-[25vw] font-display font-black text-white/[0.02] leading-none select-none pointer-events-none animate-pulse">
+      INK
     </div>
 
-    <div class="max-w-5xl mx-auto w-full relative z-10">
-      <div class="inline-flex items-center gap-2 pill px-4 py-2 mb-8 anim-fade paused">
-        <div class="w-2 h-2 rounded-full bg-green" style="animation:pulseDot 2s infinite"></div>
-        <span class="text-xs font-medium text-ink-muted tracking-wide">Abiertos para citas · Est. 1998</span>
+    <div class="max-w-4xl relative z-10">
+      <div class="inline-flex items-center gap-2 border border-white/10 rounded-full px-3 py-1 mb-8 backdrop-blur-md">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+        <span class="text-xs uppercase tracking-widest text-muted">Open for Booking</span>
       </div>
 
-      <h1 class="font-black text-[clamp(3.5rem,12vw,9rem)] leading-[.9] tracking-tight mb-6 anim-fade d1 paused">
-        Arte<br>
-        <span class="text-ink-muted font-extralight italic" style="font-size:.72em">en tu</span><br>
-        piel.
+      <h1 class="font-display font-bold text-6xl md:text-9xl leading-[0.9] mb-8 split-text">
+        TU CUERPO <br>
+        <span class="text-outline">ES EL LIENZO.</span>
       </h1>
 
-      <p class="text-ink-muted font-light text-lg leading-relaxed max-w-md mb-10 anim-fade d2 paused">
-        25 años transformando ideas en arte permanente. Cada trazo tiene una historia. La tuya está por escribirse.
+      <p class="text-lg md:text-xl text-muted max-w-lg mb-12 leading-relaxed">
+        Especialistas en transformar historias en arte permanente. Higiene clínica, diseño de autor y precisión milimétrica.
       </p>
 
-      <div class="flex flex-wrap gap-3 anim-fade d3 paused">
-        <a href="#contact" class="btn-black px-8 py-4 text-sm flex items-center gap-2">
-          Agenda tu cita
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="flex gap-4">
+        <a href="#contact" class="btn-primary px-8 py-4 rounded-lg text-sm uppercase tracking-wider flex items-center gap-2">
+          Agendar Cita <i class="ph-bold ph-arrow-right"></i>
         </a>
-        <a href="#gallery" class="btn-ghost px-8 py-4 text-sm">Ver galería</a>
+        <a href="#gallery" class="btn-outline px-8 py-4 rounded-lg text-sm uppercase tracking-wider">
+          Ver Trabajos
+        </a>
       </div>
+    </div>
+  </section>
 
-      <!-- stats row -->
-      <div class="flex flex-wrap gap-8 mt-16 anim-fade d4 paused">
-        <div>
-          <p class="font-black text-3xl tracking-tight">+2500</p>
-          <p class="text-xs text-ink-muted font-medium tracking-wider uppercase mt-0.5">Obras realizadas</p>
+  <!-- GALERIA (Masonry) -->
+  <section id="gallery" class="py-24 px-6 md:px-20 border-t border-white/5 bg-card/30">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-16">
+      <div>
+        <span class="text-xs font-mono text-muted mb-2 block">01 — PORTFOLIO</span>
+        <h2 class="font-display text-4xl md:text-5xl font-bold">Obras Recientes</h2>
+      </div>
+      <a href="#" class="text-sm underline decoration-white/30 underline-offset-4 hover:text-muted mt-4 md:mt-0">Ver Instagram</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[120vh]">
+      <!-- Columna 1 -->
+      <div class="flex flex-col gap-4 mt-12">
+        <div class="h-[40%] bg-[#1a1a1a] rounded-xl overflow-hidden relative group interactive-card">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10">
+                <span class="font-display text-2xl font-bold">Realismo</span>
+            </div>
+            <!-- Placeholder para imagen -->
+            <div class="w-full h-full bg-gradient-to-br from-gray-800 to-black opacity-50"></div>
         </div>
-        <div class="w-px bg-black/10"></div>
-        <div>
-          <p class="font-black text-3xl tracking-tight">25</p>
-          <p class="text-xs text-ink-muted font-medium tracking-wider uppercase mt-0.5">Años de experiencia</p>
+        <div class="h-[60%] bg-[#1a1a1a] rounded-xl overflow-hidden relative group interactive-card">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10">
+                <span class="font-display text-2xl font-bold">Retrato</span>
+            </div>
+             <div class="w-full h-full bg-gradient-to-tr from-gray-900 to-gray-800 opacity-50"></div>
         </div>
-        <div class="w-px bg-black/10"></div>
-        <div>
-          <p class="font-black text-3xl tracking-tight">5</p>
-          <p class="text-xs text-ink-muted font-medium tracking-wider uppercase mt-0.5">Artistas</p>
+      </div>
+      <!-- Columna 2 -->
+      <div class="flex flex-col gap-4">
+        <div class="h-[50%] bg-[#1a1a1a] rounded-xl overflow-hidden relative group interactive-card">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10">
+                <span class="font-display text-2xl font-bold">Blackwork</span>
+            </div>
+             <div class="w-full h-full bg-gradient-to-b from-gray-800 to-black opacity-50"></div>
+        </div>
+        <div class="h-[50%] bg-[#1a1a1a] rounded-xl overflow-hidden relative group interactive-card">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10">
+                <span class="font-display text-2xl font-bold">Geométrico</span>
+            </div>
+             <div class="w-full h-full bg-gradient-to-t from-gray-900 to-gray-800 opacity-50"></div>
+        </div>
+      </div>
+      <!-- Columna 3 -->
+      <div class="flex flex-col gap-4 mt-24">
+        <div class="h-[60%] bg-[#1a1a1a] rounded-xl overflow-hidden relative group interactive-card">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10">
+                <span class="font-display text-2xl font-bold">Japonés</span>
+            </div>
+             <div class="w-full h-full bg-gradient-to-bl from-gray-800 to-black opacity-50"></div>
+        </div>
+        <div class="h-[40%] bg-[#1a1a1a] rounded-xl overflow-hidden relative group interactive-card">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10">
+                <span class="font-display text-2xl font-bold">Tradicional</span>
+            </div>
+             <div class="w-full h-full bg-gradient-to-r from-gray-900 to-gray-800 opacity-50"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ── GALLERY ── -->
-  <section id="gallery" class="py-24 px-6 bg-surface">
-    <div class="max-w-5xl mx-auto">
-      <div class="flex justify-between items-end mb-12 flex-wrap gap-4">
-        <div>
-          <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">01 — Galería</p>
-          <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight reveal">
-            Nuestro<br><span class="font-extralight italic text-ink-muted">trabajo</span>
-          </h2>
+  <!-- FEATURES / CUIDADOS -->
+  <section class="py-24 px-6 md:px-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+      <div>
+        <span class="text-xs font-mono text-muted mb-2 block">02 — SEGURIDAD</span>
+        <h2 class="font-display text-4xl md:text-5xl font-bold mb-6">Estándares Clínicos.</h2>
+        <p class="text-muted text-lg mb-8">
+            No solo hacemos arte, cuidamos tu salud. Usamos materiales desechables de grado médico y tintas veganas certificadas.
+        </p>
+        
+        <div class="space-y-6">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                    <i class="ph-fill ph-shield-check text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg">Esterilización Hospitalaria</h4>
+                    <p class="text-sm text-muted">Autoclave clase B y agujas de un solo uso.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                    <i class="ph-fill ph-drop text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg">Tintas Orgánicas</h4>
+                    <p class="text-sm text-muted">Pigmentos que perduran sin dañar tu piel.</p>
+                </div>
+            </div>
         </div>
-        <p class="text-ink-muted font-light max-w-xs leading-relaxed reveal">Más de 2,500 obras. Cada una, única e irrepetible.</p>
       </div>
 
-      <!-- gallery grid -->
-      <div class="grid grid-cols-3 gap-2" id="galleryGrid">
-        <div class="gitem aspect-[.75] row-span-2 reveal flex items-center justify-center">
-          <div class="text-center">
-            <div class="text-4xl mb-2 opacity-20">⚓</div>
-            <div class="gitem-label">Old School</div>
+      <div class="relative">
+          <!-- Card Flotante -->
+          <div class="interactive-card p-8 rounded-2xl relative z-10 bg-card">
+              <h3 class="font-display text-2xl font-bold mb-6">Cuidados Posteriores</h3>
+              <ul class="space-y-4 text-sm text-muted">
+                  <li class="flex justify-between border-b border-white/5 pb-2">
+                      <span>Lavado</span>
+                      <span class="text-white">Jabón neutro 3 veces al día</span>
+                  </li>
+                  <li class="flex justify-between border-b border-white/5 pb-2">
+                      <span>Hidratación</span>
+                      <span class="text-white">Crema específica (capa fina)</span>
+                  </li>
+                  <li class="flex justify-between border-b border-white/5 pb-2">
+                      <span>Prohibido</span>
+                      <span class="text-red">Sol directo y Piscinas</span>
+                  </li>
+                  <li class="flex justify-between pt-2">
+                      <span>Tiempo de cura</span>
+                      <span class="text-white">15 - 20 días</span>
+                  </li>
+              </ul>
           </div>
-        </div>
-        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.07s">
-          <div class="text-3xl opacity-20">◈</div>
-          <div class="gitem-label">Blackwork</div>
-        </div>
-        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.14s">
-          <div class="text-3xl opacity-20">🌹</div>
-          <div class="gitem-label">Realismo</div>
-        </div>
-        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.21s">
-          <div class="text-3xl opacity-20">△</div>
-          <div class="gitem-label">Geométrico</div>
-        </div>
-        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.28s">
-          <div class="text-3xl opacity-20">🐍</div>
-          <div class="gitem-label">Neo-trad</div>
-        </div>
-      </div>
-      <p class="text-xs text-ink-muted text-center mt-4 tracking-wider font-medium reveal">Toca cada pieza para ver el estilo</p>
-    </div>
-  </section>
-
-  <!-- ── SCHEDULE ── -->
-  <section class="py-24 px-6 bg-white">
-    <div class="max-w-5xl mx-auto">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">02 — Horarios</p>
-      <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight mb-12 reveal">
-        Cuándo<br><span class="font-extralight italic text-ink-muted">estamos</span>
-      </h2>
-      <div class="max-w-lg">
-        <div class="flex justify-between items-center py-4 border-b border-black/[.06] reveal">
-          <span class="font-semibold text-base">Lunes — Viernes</span>
-          <span class="text-ink-muted font-light text-sm">10:00 — 20:00</span>
-        </div>
-        <div class="flex justify-between items-center py-4 border-b border-black/[.06] reveal" style="transition-delay:.06s">
-          <span class="font-semibold text-base">Sábado</span>
-          <span class="text-ink-muted font-light text-sm">10:00 — 18:00</span>
-        </div>
-        <div class="flex justify-between items-center py-4 reveal" style="transition-delay:.12s">
-          <span class="font-semibold text-base">Domingo</span>
-          <span class="text-red font-medium text-sm">Cerrado</span>
-        </div>
-      </div>
-      <p class="text-sm text-ink-muted font-light mt-8 reveal">Trabajamos exclusivamente con cita previa.</p>
-    </div>
-  </section>
-
-  <!-- ── CARE CARDS ── -->
-  <section class="py-24 px-6 bg-surface">
-    <div class="max-w-5xl mx-auto">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">03 — Post-tatuaje</p>
-      <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight mb-12 reveal">
-        Cuidados<br><span class="font-extralight italic text-ink-muted">esenciales</span>
-      </h2>
-      <div class="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <div class="card p-6 care-card-hover border border-black/[.06] reveal">
-          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">01</p>
-          <p class="font-semibold text-sm mb-1">Limpieza diaria</p>
-          <p class="text-ink-muted text-xs font-light leading-relaxed">Jabón neutro 2–3 veces al día los primeros días.</p>
-        </div>
-        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.07s">
-          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">02</p>
-          <p class="font-semibold text-sm mb-1">Hidratación</p>
-          <p class="text-ink-muted text-xs font-light leading-relaxed">Crema especializada mínimo 2 semanas.</p>
-        </div>
-        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.14s">
-          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">03</p>
-          <p class="font-semibold text-sm mb-1">Sin sol</p>
-          <p class="text-ink-muted text-xs font-light leading-relaxed">Nada de sol directo el primer mes.</p>
-        </div>
-        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.21s">
-          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">04</p>
-          <p class="font-semibold text-sm mb-1">Sin agua</p>
-          <p class="text-ink-muted text-xs font-light leading-relaxed">Piscinas y mar: espera 2 semanas.</p>
-        </div>
-        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.28s">
-          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">05</p>
-          <p class="font-semibold text-sm mb-1">No rasques</p>
-          <p class="text-ink-muted text-xs font-light leading-relaxed">Deja caer las costras naturalmente.</p>
-        </div>
+          <!-- Elemento decorativo detrás -->
+          <div class="absolute top-10 -right-10 w-full h-full border border-white/10 rounded-2xl z-0"></div>
       </div>
     </div>
   </section>
 
-  <!-- ── FAQ ── -->
-  <section class="py-24 px-6 bg-white">
-    <div class="max-w-5xl mx-auto">
-      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">04 — FAQ</p>
-      <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight mb-12 reveal">
-        Preguntas<br><span class="font-extralight italic text-ink-muted">frecuentes</span>
-      </h2>
-      <div class="max-w-xl" id="faqList">
-        <div class="faq-item border-t border-black/[.06] reveal">
-          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
-            <span class="font-semibold text-base">¿Cuánto cuesta un tatuaje?</span>
-            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
-          </button>
-          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
-            El precio varía según tamaño, detalle y ubicación. Escríbenos para un presupuesto personalizado sin compromiso.
-          </div>
-        </div>
-        <div class="faq-item border-t border-black/[.06] reveal" style="transition-delay:.05s">
-          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
-            <span class="font-semibold text-base">¿Necesito cita previa?</span>
-            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
-          </button>
-          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
-            Sí. Trabajamos con cita para garantizar el tiempo y la atención que cada proyecto merece.
-          </div>
-        </div>
-        <div class="faq-item border-t border-black/[.06] reveal" style="transition-delay:.1s">
-          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
-            <span class="font-semibold text-base">¿Duele?</span>
-            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
-          </button>
-          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
-            Varía según la zona, pero es completamente tolerable. La mayoría lo describe como un rasguño continuo.
-          </div>
-        </div>
-        <div class="faq-item border-t border-black/[.06] reveal" style="transition-delay:.15s">
-          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
-            <span class="font-semibold text-base">¿Cuánto tarda en sanar?</span>
-            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
-          </button>
-          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
-            Recuperación completa: 2–4 semanas. Los primeros 10 días son los más críticos.
-          </div>
-        </div>
-        <div class="faq-item border-t border-t-black/[.06] border-b border-black/[.06] reveal" style="transition-delay:.2s">
-          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
-            <span class="font-semibold text-base">¿Puedo traer mi diseño?</span>
-            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
-          </button>
-          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
-            Por supuesto. También podemos crear diseños completamente originales para ti.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- FAQ ACORDEÓN -->
+  <section id="faq" class="py-24 px-6 md:px-20 border-t border-white/5">
+    <div class="max-w-3xl mx-auto">
+        <h2 class="font-display text-4xl font-bold mb-12 text-center">Preguntas Frecuentes</h2>
+        
+        <div class="space-y-4">
+            <!-- FAQ ITEM 1 -->
+            <div class="border border-white/10 rounded-lg overflow-hidden faq-item">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-colors" onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">¿Duele mucho?</span>
+                    <i class="ph-bold ph-plus transition-transform duration-300"></i>
+                </button>
+                <div class="faq-content h-0 overflow-hidden px-6 text-muted transition-all duration-300">
+                    <p class="pb-6">Depende de la zona y tu umbral de dolor. La mayoría lo describe como un rasguño caliente constante. Es soportable y vale la pena.</p>
+                </div>
+            </div>
 
-  <!-- ── CONTACT ── -->
-  <section id="contact" class="py-32 px-6 bg-ink overflow-hidden relative">
-    <div class="absolute inset-0 opacity-[.04]"
-         style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;"></div>
-    <div class="max-w-5xl mx-auto relative z-10">
-      <div class="grid md:grid-cols-2 gap-16 items-center">
-        <div>
-          <h2 class="font-black text-[clamp(3rem,9vw,6rem)] leading-[.9] tracking-tight text-white mb-6 reveal">
-            Hagamos<br>
-            <span class="font-extralight italic text-white/35">algo grande.</span>
-          </h2>
-          <p class="text-white/50 font-light text-lg leading-relaxed mb-10 reveal">
-            Tu idea merece un artista que la entienda. Cuéntanos qué tienes en mente.
-          </p>
-          <a href="https://wa.me/1234567890?text=Hola!%20Quiero%20información%20sobre%20tatuajes"
-             target="_blank"
-             class="btn-red px-8 py-4 text-sm inline-flex items-center gap-2 reveal">
-            Escribir por WhatsApp
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
+            <!-- FAQ ITEM 2 -->
+            <div class="border border-white/10 rounded-lg overflow-hidden faq-item">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-colors" onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">¿Cuál es el precio mínimo?</span>
+                    <i class="ph-bold ph-plus transition-transform duration-300"></i>
+                </button>
+                <div class="faq-content h-0 overflow-hidden px-6 text-muted transition-all duration-300">
+                    <p class="pb-6">El precio base es de $50 USD para cubrir material estéril. El costo final depende del tamaño, detalle y tiempo de sesión.</p>
+                </div>
+            </div>
+
+            <!-- FAQ ITEM 3 -->
+            <div class="border border-white/10 rounded-lg overflow-hidden faq-item">
+                <button class="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-colors" onclick="toggleFaq(this)">
+                    <span class="font-bold text-lg">¿Cómo agendo una cita?</span>
+                    <i class="ph-bold ph-plus transition-transform duration-300"></i>
+                </button>
+                <div class="faq-content h-0 overflow-hidden px-6 text-muted transition-all duration-300">
+                    <p class="pb-6">Escríbenos por WhatsApp con tu idea, tamaño aproximado y zona del cuerpo. Te daremos un presupuesto y fechas disponibles.</p>
+                </div>
+            </div>
         </div>
-        <div class="space-y-8 reveal">
-          <div class="border-b border-white/10 pb-8">
-            <p class="text-white/30 text-[.65rem] font-semibold tracking-[.45em] uppercase mb-1">WhatsApp</p>
-            <p class="text-white font-semibold text-xl">+34 123 456 789</p>
-          </div>
-          <div class="border-b border-white/10 pb-8">
-            <p class="text-white/30 text-[.65rem] font-semibold tracking-[.45em] uppercase mb-1">Horario</p>
-            <p class="text-white font-semibold text-xl">Lun–Sáb, 10h a 20h</p>
-          </div>
-          <div>
-            <p class="text-white/30 text-[.65rem] font-semibold tracking-[.45em] uppercase mb-1">Ubicación</p>
-            <p class="text-white font-semibold text-xl">Calle Ejemplo 123, Ciudad</p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="py-12 px-6 bg-surface border-t border-black/[.05]">
-    <div class="max-w-5xl mx-auto flex justify-between items-center flex-wrap gap-4">
-      <p class="font-black text-lg tracking-tight">INK STUDIO</p>
-      <p class="text-ink-muted text-xs font-light tracking-wider">© 2025 · Arte permanente</p>
+  <footer id="contact" class="py-20 px-6 md:px-20 bg-card text-center">
+    <h2 class="font-display text-[12vw] font-bold leading-none text-white/10 select-none">
+        INK STUDIO
+    </h2>
+    
+    <div class="flex flex-col md:flex-row justify-center gap-10 mt-12 text-sm uppercase tracking-widest font-bold">
+        <a href="#" class="hover:text-white text-muted transition-colors">Instagram</a>
+        <a href="#" class="hover:text-white text-muted transition-colors">WhatsApp</a>
+        <a href="#" class="hover:text-white text-muted transition-colors">Ubicación</a>
     </div>
+
+    <p class="mt-12 text-xs text-muted font-mono">© 2026 INK STUDIO. ALL RIGHTS RESERVED.</p>
   </footer>
 
-</div><!-- /app -->
-
-
-<!-- TOAST -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]
-     glass-dark text-white text-xs font-medium tracking-wide px-5 py-3 rounded-full
-     opacity-0 translate-y-4 pointer-events-none whitespace-nowrap">
 </div>
 
-
+<!-- ══════════════════════════════════════
+     SCRIPTS & LOGIC
+══════════════════════════════════════ -->
 <script>
-/* ── GREETINGS ── */
-const G_FIRST = [
-  "Bienvenido a Ink Studio.",
-  "Qué bueno que estás aquí.",
-  "Tu historia comienza hoy.",
-  "Listos para conocerte.",
-];
-const G_RETURN = [
-  "¿De vuelta? Qué bueno verte.",
-  "Sabíamos que volverías.",
-  "Tu artista ya te está esperando.",
-  "Seguimos donde lo dejamos.",
-  "Bienvenido de nuevo. ✦",
-  "Nos alegra verte otra vez.",
-  "Tu próximo tatuaje te llama.",
-  "Aquí estamos, siempre.",
-  "¿Listo para dar el siguiente paso?",
-  "El arte no espera. Ni tú tampoco.",
-  "De vuelta al estudio. Perfecto.",
-  "¿Ya decidiste la zona?",
-  "Cada visita, más cerca del diseño ideal.",
-  "Tu lienzo sigue esperando.",
-  "El mejor tatuaje es el próximo.",
-  "Hola de nuevo, ¿en qué te ayudamos?",
-  "Nos recuerdas. Te recordamos.",
-  "La tinta tiene memoria. Tú también.",
-  "¿Qué historia contaremos hoy?",
-  "Bienvenido al lugar donde las ideas se vuelven permanentes.",
-];
+    // ─── 1. INITIALIZATION & SPLASH ───
+    
+    // Register GSAP Plugin
+    gsap.registerPlugin(ScrollTrigger);
 
-/* ── STATE ── */
-let state = {};
-function loadState() { try { state = JSON.parse(localStorage.getItem('ink_v6')||'{}'); } catch(e){} }
-function saveState() { localStorage.setItem('ink_v6', JSON.stringify(state)); }
-
-let answers = [null,null,null,null];
-
-/* ── TOAST ── */
-function showToast(msg, dur=3200) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.remove('opacity-0','translate-y-4');
-  t.classList.add('opacity-100','translate-y-0');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => {
-    t.classList.add('opacity-0','translate-y-4');
-    t.classList.remove('opacity-100','translate-y-0');
-  }, dur);
-}
-
-/* ── STATUS ── */
-function updateStatus() {
-  const n=new Date(), d=n.getDay(), t=n.getHours()+n.getMinutes()/60;
-  const open = (d>=1&&d<=5&&t>=10&&t<20)||(d===6&&t>=10&&t<18);
-  document.getElementById('navStatus').className =
-    'flex items-center gap-2 pill px-4 py-1.5' + (open ? '' : ' border-red/30');
-  document.getElementById('navDot').style.background = open ? '#34C759' : '#FF3B30';
-  document.getElementById('navStatusText').textContent = open ? 'Abierto ahora' : 'Cerrado';
-}
-
-/* ── QUIZ ── */
-function selectOpt(el, step) {
-  document.querySelectorAll(`[data-q="${step}"]`).forEach(o => o.classList.remove('chosen'));
-  el.classList.add('chosen');
-  answers[step] = el.dataset.v;
-  const btn = document.getElementById('qnext'+step);
-  if (btn) {
-    btn.classList.remove('opacity-0','pointer-events-none');
-    btn.classList.add('opacity-100');
-  }
-}
-
-function nextStep(to) {
-  if (answers[to-1] === null) return;
-  const from = document.getElementById('qs'+(to-1));
-  from.style.opacity = '0';
-  from.style.transform = 'translateY(-16px)';
-  from.style.transition = 'all .35s cubic-bezier(.16,1,.3,1)';
-  setTimeout(() => {
-    from.classList.add('hidden');
-    from.style.opacity = '';
-    from.style.transform = '';
-    const next = document.getElementById('qs'+to);
-    next.classList.remove('hidden');
-    next.style.opacity = '0';
-    next.style.transform = 'translateY(24px)';
-    next.style.transition = 'none';
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        next.style.transition = 'all .5s cubic-bezier(.16,1,.3,1)';
-        next.style.opacity = '1';
-        next.style.transform = 'translateY(0)';
-      });
+    // Initialize Lenis (Smooth Scroll)
+    const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smooth: true,
     });
-  }, 280);
-}
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
 
-function showResult() {
-  if (answers[3] === null) return;
-  const from = document.getElementById('qs3');
-  from.style.opacity = '0';
-  from.style.transform = 'translateY(-16px)';
-  from.style.transition = 'all .35s cubic-bezier(.16,1,.3,1)';
-  setTimeout(() => {
-    from.classList.add('hidden');
-    const res = document.getElementById('quizResult');
-    res.classList.remove('hidden');
-    res.style.opacity = '0';
-    res.style.transform = 'scale(.95)';
-    res.style.transition = 'none';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      res.style.transition = 'all .5s cubic-bezier(.16,1,.3,1)';
-      res.style.opacity = '1';
-      res.style.transform = 'scale(1)';
-    }));
+    // Splash Logic
+    window.addEventListener('load', () => {
+        const tl = gsap.timeline();
 
-    const zM={cabeza:'Cabeza',cuello:'Cuello',torso:'Torso',brazo:'Brazo',pierna:'Pierna',espalda:'Espalda'};
-    const sM={realismo:'Realismo',oldschool:'Old School',blackwork:'Blackwork',geometrico:'Geométrico'};
-    const szM={pequeno:'Pequeño',mediano:'Mediano',grande:'Grande'};
-    const isFirst = answers[0]==='first';
-
-    document.getElementById('resultTitle').textContent = isFirst ? 'Todo listo.' : 'Bienvenido de vuelta.';
-    document.getElementById('resultSub').textContent = isFirst
-      ? `Un ${sM[answers[2]]||''} en ${zM[answers[1]]||''}, tamaño ${szM[answers[3]]||''}. Perfecto punto de partida.`
-      : `Zona: ${zM[answers[1]]||''}. Estilo: ${sM[answers[2]]||''}. Ya sabemos lo que necesitas.`;
-
-    const tags = document.getElementById('resultTags');
-    tags.innerHTML = '';
-    [zM[answers[1]], sM[answers[2]], szM[answers[3]]].filter(Boolean).forEach(t => {
-      const d = document.createElement('span');
-      d.className = 'pill px-4 py-1.5 text-xs font-medium';
-      d.textContent = t;
-      tags.appendChild(d);
+        // Animate Splash
+        tl.to("#splash-bar", { width: "100%", duration: 1.5, ease: "power2.inOut" })
+          .to("#splash-title", { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, "-=0.5")
+          .to("#splash-sub", { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, "-=0.8")
+          .to("#splash", { 
+              yPercent: -100, 
+              duration: 1, 
+              ease: "power4.inOut",
+              onComplete: checkState // Decide where to go
+          }, "+=0.5");
     });
 
-    state.completed = true;
-    state.answers = answers;
-    saveState();
-  }, 280);
-}
+    // ─── 2. STATE MANAGEMENT ───
+    function checkState() {
+        const hasVisited = localStorage.getItem('ink_visited');
+        if (hasVisited) {
+            showMainSite();
+        } else {
+            startQuiz();
+        }
+    }
 
-function enterApp() {
-  document.getElementById('quiz').classList.remove('opacity-100','pointer-events-all');
-  document.getElementById('quiz').classList.add('opacity-0','pointer-events-none');
-  setTimeout(() => showApp(), 450);
-}
+    // ─── 3. QUIZ LOGIC ───
+    let currentStep = 1;
+    let preferences = {};
 
-/* ── APP ── */
-function showApp() {
-  const app = document.getElementById('app');
-  app.classList.remove('opacity-0');
-  app.classList.add('opacity-100');
-  initScroll();
-  // run hero animations
-  document.querySelectorAll('.anim-fade.paused').forEach(el => {
-    el.classList.remove('paused');
-    el.classList.add('running');
-  });
-  const greet = state.answers?.[0]==='returning'
-    ? G_RETURN[Math.floor(Math.random()*G_RETURN.length)]
-    : 'Bienvenido al estudio.';
-  setTimeout(() => showToast(greet), 900);
-}
+    function startQuiz() {
+        gsap.to("#quiz-container", { autoAlpha: 1, pointerEvents: "all", duration: 0.5 });
+    }
 
-/* ── SCROLL REVEAL ── */
-function initScroll() {
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
-  }, { threshold: .12, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.reveal').forEach((el, i) => {
-    io.observe(el);
-  });
-}
+    function selectOption(step, value, element) {
+        // Visual feedback
+        const siblings = element.parentElement.children;
+        for (let el of siblings) el.classList.remove('selected');
+        element.classList.add('selected');
+        
+        preferences[`step${step}`] = value;
+        
+        // Wait a bit then move
+        setTimeout(() => {
+            if (step < 3) {
+                goToStep(step + 1);
+            }
+        }, 400);
+    }
 
-/* ── FAQ ── */
-function toggleFaq(btn) {
-  const item = btn.closest('.faq-item');
-  const wasOpen = item.classList.contains('faq-open');
-  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('faq-open'));
-  if (!wasOpen) item.classList.add('faq-open');
-}
+    function goToStep(nextStepNum) {
+        const currentEl = document.getElementById(`step-${currentStep}`);
+        const nextEl = document.getElementById(`step-${nextStepNum}`);
+        
+        gsap.to(currentEl, { 
+            opacity: 0, 
+            y: -20, 
+            pointerEvents: "none", 
+            duration: 0.5 
+        });
+        
+        gsap.to(nextEl, { 
+            opacity: 1, 
+            y: 0, 
+            pointerEvents: "all", 
+            duration: 0.5, 
+            delay: 0.2 
+        });
+        
+        currentStep = nextStepNum;
+    }
 
-/* ── NAV SCROLL ── */
-window.addEventListener('scroll', () => {
-  const nav = document.getElementById('navbar');
-  window.scrollY > 40 ? nav.classList.add('nav-scrolled') : nav.classList.remove('nav-scrolled');
-}, { passive: true });
+    function finishQuiz(size) {
+        preferences.step3 = size;
+        localStorage.setItem('ink_visited', 'true');
+        localStorage.setItem('ink_prefs', JSON.stringify(preferences));
+        
+        // Close quiz and show site
+        gsap.to("#quiz-container", { 
+            autoAlpha: 0, 
+            scale: 0.95, 
+            duration: 0.6, 
+            ease: "power2.in",
+            onComplete: showMainSite
+        });
+    }
 
-/* ── SMOOTH SCROLL ── */
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
-    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
-  });
-});
+    function skipQuiz() {
+        localStorage.setItem('ink_visited', 'true'); // Don't show again
+        gsap.to("#quiz-container", { 
+            autoAlpha: 0, 
+            duration: 0.5,
+            onComplete: showMainSite
+        });
+    }
 
-/* ── INIT ── */
-function init() {
-  loadState();
-  updateStatus();
-  setInterval(updateStatus, 60000);
+    // ─── 4. MAIN SITE REVEAL ───
+    function showMainSite() {
+        const site = document.getElementById('main-site');
+        gsap.to(site, { opacity: 1, duration: 1 });
+        
+        // Trigger GSAP Animations for elements
+        gsap.from(".split-text", {
+            y: 50, opacity: 0, duration: 1, delay: 0.2, ease: "power3.out"
+        });
+    }
 
-  const isReturning = !!state.completed;
-  const greet = isReturning
-    ? G_RETURN[Math.floor(Math.random()*G_RETURN.length)]
-    : G_FIRST[Math.floor(Math.random()*G_FIRST.length)];
+    // ─── 5. FAQ TOGGLE ───
+    function toggleFaq(btn) {
+        const content = btn.nextElementSibling;
+        const icon = btn.querySelector('i');
+        
+        // Close all others (optional)
+        document.querySelectorAll('.faq-content').forEach(el => {
+            if (el !== content) {
+                el.style.height = '0px';
+                el.previousElementSibling.querySelector('i').style.transform = 'rotate(0deg)';
+            }
+        });
 
-  document.getElementById('splashGreet').textContent = greet;
+        if (content.style.height === '' || content.style.height === '0px') {
+            content.style.height = content.scrollHeight + 'px';
+            icon.style.transform = 'rotate(45deg)';
+        } else {
+            content.style.height = '0px';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
 
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('out');
-    setTimeout(() => {
-      if (isReturning) {
-        showApp();
-        setTimeout(() => showToast(greet), 800);
-      } else {
-        const quiz = document.getElementById('quiz');
-        quiz.classList.remove('opacity-0','pointer-events-none');
-        quiz.classList.add('opacity-100','pointer-events-all');
-        document.getElementById('qs0').classList.remove('hidden');
-      }
-    }, 700);
-  }, 2600);
-}
+    // ─── 6. CANVAS BACKGROUND (PARTICLES) ───
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
 
-window.addEventListener('DOMContentLoaded', init);
-window.resetProgress = () => { localStorage.removeItem('ink_v6'); location.reload(); };
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.size = Math.random() * 2;
+            this.alpha = Math.random() * 0.5;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0) this.x = width;
+            if (this.x > width) this.x = 0;
+            if (this.y < 0) this.y = height;
+            if (this.y > height) this.y = 0;
+        }
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.3})`; // Subtle white
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function initCanvas() {
+        resize();
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+        loop();
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', resize);
+    initCanvas();
+
 </script>
 </body>
 </html>
