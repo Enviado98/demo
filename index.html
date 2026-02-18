@@ -1,41 +1,35 @@
 <!DOCTYPE html>
-<html lang="es" class="no-js">
+<html lang="es" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INK STUDIO | Arte Corporal</title>
-<meta name="description" content="Estudio de tatuajes premium. Artistas expertos, higiene clínica y diseños personalizados.">
+<title>INK STUDIO — Tattoo & Body Art</title>
+<meta name="description" content="Estudio de tatuajes profesional. Arte permanente desde 1998. Cita previa.">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- GSAP & Lenis -->
+<!-- GSAP (Motor de animación profesional) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-<script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
 
 <!-- Fuentes -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-
-<!-- Iconos -->
-<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <script>
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: {
-          sans: ['Space Grotesk', 'sans-serif'],
-          display: ['Syne', 'sans-serif'],
-        },
+        fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
         colors: {
-          'void': '#050505',
-          'card': '#121212',
-          'border': '#262626',
-          'accent': '#E1E1E1',
-          'muted': '#888888',
+          'ink': '#0e0e0e',
+          'ink-mid': '#3a3a3a',
+          'ink-muted': '#86868B',
+          'surface': '#F5F5F7',
+          'red': '#FF3B30',
+          'green': '#34C759',
         }
       }
     }
@@ -43,286 +37,440 @@
 </script>
 
 <style>
-  /* ── BASE ── */
-  html.lenis, html.lenis body { height: auto; }
-  .lenis.lenis-smooth { scroll-behavior: auto !important; }
-  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-  .lenis.lenis-stopped { overflow: hidden; }
-  
-  body { 
-    background-color: #050505; 
-    color: #E1E1E1; 
-    overflow-x: hidden;
-    opacity: 1 !important; /* FORZAR VISIBILIDAD */
+  /* RESET & BASE */
+  body { background: #ffffff; color: #0e0e0e; overflow-x: hidden; opacity: 1 !important; }
+
+  /* UTILIDADES VISUALES */
+  .glass {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
   }
 
-  /* ── CANVAS FONDO ── */
-  #bg-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -1; opacity: 0.3; pointer-events: none;
-  }
-
-  /* ── COMPONENTES ── */
-  .interactive-card {
-    background: #0f0f0f;
-    border: 1px solid #1f1f1f;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .interactive-card:hover {
-    border-color: #333;
-    transform: translateY(-4px);
-    background: #141414;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-  }
-  
-  .btn-primary {
-    background: #E1E1E1;
-    color: #050505;
-    font-weight: 600;
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
     transition: all 0.3s ease;
   }
-  .btn-primary:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,255,255,0.15); }
-
-  .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.15); color: transparent; }
-
-  /* ── ESTADOS DE VISIBILIDAD ── */
-  .hidden-force { display: none !important; }
-  .opacity-0-force { opacity: 0; pointer-events: none; }
-  .opacity-100-force { opacity: 1; pointer-events: all; }
-  
-  /* Transiciones suaves manuales por si falla GSAP */
-  #main-site, #quiz-container, #splash {
-      transition: opacity 0.8s ease, transform 0.8s ease;
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    border-color: rgba(0,0,0,0.15);
   }
+
+  /* BOTONES */
+  .btn-black {
+    background: #0e0e0e; color: #fff;
+    border-radius: 99px; font-weight: 600;
+    transition: transform 0.2s;
+  }
+  .btn-black:hover { transform: scale(1.05); }
+  
+  .btn-ghost {
+    background: #f3f4f6; color: #0e0e0e;
+    border-radius: 99px; font-weight: 600;
+    transition: background 0.2s;
+  }
+  .btn-ghost:hover { background: #e5e7eb; }
+
+  /* QUIZ CARDS */
+  .qcard {
+    border: 1px solid #e5e7eb; border-radius: 16px;
+    background: #fff; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .qcard:hover { border-color: #0e0e0e; transform: translateY(-2px); }
+  .qcard.selected { background: #0e0e0e; color: #fff; border-color: #0e0e0e; }
+  .qcard.selected .sub-text { color: #9ca3af; }
+  .qcard.selected svg path, .qcard.selected svg rect, .qcard.selected svg circle, .qcard.selected svg ellipse { fill: #fff; }
+  .qcard.selected svg line { stroke: #fff; }
+
+  /* FAQ */
+  .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+  .faq-item.active .faq-content { max-height: 200px; }
+  .faq-icon { transition: transform 0.3s; }
+  .faq-item.active .faq-icon { transform: rotate(45deg); }
+
+  /* ANIMACIONES DE ENTRADA */
+  .reveal-section { opacity: 0; transform: translateY(30px); }
+
+  /* SPLASH */
+  #splash { position: fixed; inset: 0; z-index: 9999; background: #0e0e0e; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 </style>
 </head>
 <body class="antialiased">
 
-<!-- CANVAS -->
-<canvas id="bg-canvas"></canvas>
-
-<!-- SPLASH SCREEN (INTRO) -->
-<div id="splash" class="fixed inset-0 z-[9999] bg-void flex flex-col items-center justify-center">
-  <h1 class="font-display font-bold text-[15vw] leading-[0.8] text-accent tracking-tighter" id="splash-title">
-    INK STUDIO
+<!-- ══════════════════════════════════════
+     SPLASH SCREEN (PANTALLA DE CARGA)
+══════════════════════════════════════ -->
+<div id="splash">
+  <p class="text-white/40 text-xs font-medium tracking-[.45em] uppercase mb-6">Bienvenido</p>
+  <h1 class="text-white font-black text-6xl md:text-9xl tracking-tighter text-center mb-4">
+    INK<br>STUDIO
   </h1>
-  <p class="font-sans text-sm tracking-[0.5em] text-muted uppercase mt-4" id="splash-sub">
-    Cargando Experiencia...
-  </p>
-  <div class="absolute bottom-0 left-0 w-full h-[2px] bg-white/10">
-    <div id="splash-bar" class="h-full bg-white w-0 transition-all duration-[2000ms] ease-out"></div>
+  <div class="w-64 h-[2px] bg-white/10 rounded-full overflow-hidden mt-8">
+    <div id="loader-bar" class="h-full bg-white w-0"></div>
   </div>
 </div>
 
-<!-- QUIZ (PREGUNTAS) -->
-<div id="quiz-container" class="fixed inset-0 z-[9000] bg-void/95 backdrop-blur-xl flex items-center justify-center p-6 opacity-0-force">
-  <button onclick="skipQuiz()" class="absolute top-6 right-6 text-xs text-muted hover:text-white uppercase tracking-widest border border-white/10 px-4 py-2 rounded-full transition-colors z-50">
-    Saltar ✕
-  </button>
-
+<!-- ══════════════════════════════════════
+     QUIZ (CUESTIONARIO INICIAL)
+══════════════════════════════════════ -->
+<div id="quiz-container" class="fixed inset-0 z-[9000] bg-white hidden flex-col items-center justify-center p-6">
   <div class="w-full max-w-2xl relative">
+    
     <!-- Paso 1 -->
     <div class="quiz-step" id="step-1">
-      <div class="mb-6"><div class="w-full h-1 bg-[#1f1f1f] rounded"><div class="h-full bg-white w-1/3 transition-all"></div></div></div>
-      <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">¿Es tu primera vez?</h2>
+      <div class="mb-8 flex items-center justify-between">
+        <span class="text-xs font-bold tracking-widest uppercase text-gray-400">Paso 1/3</span>
+        <button onclick="skipQuiz()" class="text-xs underline text-gray-400 hover:text-black">Saltar Intro</button>
+      </div>
+      <h2 class="font-black text-5xl mb-2">¿Es tu primera vez?</h2>
+      <p class="text-gray-500 text-lg mb-10">Queremos asignarte el artista adecuado.</p>
+      
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div onclick="nextStep(2)" class="interactive-card p-8 rounded-xl cursor-pointer group">
-          <i class="ph-fill ph-sparkle text-3xl mb-4 text-muted group-hover:text-white"></i>
-          <h3 class="text-2xl font-bold">Sí, primera tinta</h3>
+        <div onclick="nextStep(2)" class="qcard p-8 flex flex-col items-center justify-center gap-4 py-12">
+            <span class="text-4xl font-bold">Sí</span>
+            <span class="sub-text text-xs uppercase tracking-widest text-gray-500">Primera Tinta</span>
         </div>
-        <div onclick="nextStep(2)" class="interactive-card p-8 rounded-xl cursor-pointer group">
-          <i class="ph-fill ph-infinity text-3xl mb-4 text-muted group-hover:text-white"></i>
-          <h3 class="text-2xl font-bold">No, ya tengo</h3>
+        <div onclick="nextStep(2)" class="qcard p-8 flex flex-col items-center justify-center gap-4 py-12">
+            <span class="text-4xl font-bold">No</span>
+            <span class="sub-text text-xs uppercase tracking-widest text-gray-500">Ya tengo Tatuajes</span>
         </div>
       </div>
     </div>
 
     <!-- Paso 2 -->
-    <div class="quiz-step hidden-force" id="step-2">
-      <div class="mb-6"><div class="w-full h-1 bg-[#1f1f1f] rounded"><div class="h-full bg-white w-2/3 transition-all"></div></div></div>
-      <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Estilo Preferido</h2>
+    <div class="quiz-step hidden" id="step-2">
+      <div class="mb-8"><span class="text-xs font-bold tracking-widest uppercase text-gray-400">Paso 2/3</span></div>
+      <h2 class="font-black text-5xl mb-2">¿Qué estilo buscas?</h2>
+      <p class="text-gray-500 text-lg mb-10">Selecciona la estética que te gusta.</p>
       <div class="grid grid-cols-2 gap-4">
-        <div onclick="nextStep(3)" class="interactive-card p-6 rounded-xl cursor-pointer text-center font-bold">Realismo</div>
-        <div onclick="nextStep(3)" class="interactive-card p-6 rounded-xl cursor-pointer text-center font-bold">Blackwork</div>
-        <div onclick="nextStep(3)" class="interactive-card p-6 rounded-xl cursor-pointer text-center font-bold">Línea Fina</div>
-        <div onclick="nextStep(3)" class="interactive-card p-6 rounded-xl cursor-pointer text-center font-bold">Tradicional</div>
+        <div onclick="nextStep(3)" class="qcard p-6 text-center"><span class="font-bold text-lg">Realismo</span></div>
+        <div onclick="nextStep(3)" class="qcard p-6 text-center"><span class="font-bold text-lg">Old School</span></div>
+        <div onclick="nextStep(3)" class="qcard p-6 text-center"><span class="font-bold text-lg">Blackwork</span></div>
+        <div onclick="nextStep(3)" class="qcard p-6 text-center"><span class="font-bold text-lg">Geométrico</span></div>
       </div>
     </div>
 
     <!-- Paso 3 -->
-    <div class="quiz-step hidden-force" id="step-3">
-      <div class="mb-6"><div class="w-full h-1 bg-[#1f1f1f] rounded"><div class="h-full bg-white w-full transition-all"></div></div></div>
-      <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Tamaño</h2>
-      <div class="grid grid-cols-3 gap-4">
-        <div onclick="finishQuiz()" class="interactive-card p-6 rounded-xl cursor-pointer text-center hover:bg-white hover:text-black transition-colors">
-          <div class="w-6 h-6 rounded-full border border-current mx-auto mb-2"></div>
-          <span class="font-bold">Pequeño</span>
+    <div class="quiz-step hidden" id="step-3">
+        <div class="mb-8"><span class="text-xs font-bold tracking-widest uppercase text-gray-400">Paso 3/3</span></div>
+        <h2 class="font-black text-5xl mb-2">¿Qué tamaño?</h2>
+        <p class="text-gray-500 text-lg mb-10">Esto define el tiempo de sesión.</p>
+        <div class="grid grid-cols-3 gap-4">
+          <div onclick="finishQuiz()" class="qcard p-6 text-center py-10">
+              <div class="w-6 h-6 bg-gray-200 rounded-full mx-auto mb-4"></div>
+              <span class="font-bold">Pequeño</span>
+          </div>
+          <div onclick="finishQuiz()" class="qcard p-6 text-center py-10">
+            <div class="w-10 h-10 bg-gray-200 rounded-full mx-auto mb-4"></div>
+            <span class="font-bold">Mediano</span>
         </div>
-        <div onclick="finishQuiz()" class="interactive-card p-6 rounded-xl cursor-pointer text-center hover:bg-white hover:text-black transition-colors">
-          <div class="w-10 h-10 rounded-full border border-current mx-auto mb-2"></div>
-          <span class="font-bold">Mediano</span>
+        <div onclick="finishQuiz()" class="qcard p-6 text-center py-10">
+            <div class="w-14 h-14 bg-gray-200 rounded-full mx-auto mb-4"></div>
+            <span class="font-bold">Grande</span>
         </div>
-        <div onclick="finishQuiz()" class="interactive-card p-6 rounded-xl cursor-pointer text-center hover:bg-white hover:text-black transition-colors">
-          <div class="w-14 h-14 rounded-full border border-current mx-auto mb-2"></div>
-          <span class="font-bold">Grande</span>
         </div>
       </div>
-    </div>
+
   </div>
 </div>
 
-<!-- MAIN SITE -->
-<div id="main-site" class="relative opacity-0-force">
-  
-  <nav class="fixed top-0 w-full z-40 px-6 py-6 flex justify-between items-center mix-blend-difference">
-    <a href="#" class="font-display font-bold text-xl tracking-tighter">INK STUDIO.</a>
-    <a href="#contact" class="px-5 py-2 border border-white rounded-full text-xs uppercase hover:bg-white hover:text-black transition-all font-bold">Reservar</a>
+<!-- ══════════════════════════════════════
+     WEB PRINCIPAL
+══════════════════════════════════════ -->
+<div id="app" class="hidden">
+
+  <!-- NAVBAR -->
+  <nav class="fixed w-full z-50 glass transition-all duration-300">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
+      <a href="#" class="font-black text-xl tracking-tighter text-ink">INK STUDIO.</a>
+      <div class="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
+        <div class="w-2 h-2 rounded-full bg-green animate-pulse"></div>
+        <span class="text-xs font-bold uppercase tracking-wide text-gray-600">Abierto</span>
+      </div>
+    </div>
   </nav>
 
-  <section class="relative min-h-screen flex items-center px-6 md:px-20 pt-20">
-    <div class="max-w-4xl relative z-10">
-      <div class="inline-flex items-center gap-2 border border-white/10 rounded-full px-3 py-1 mb-8 backdrop-blur-md">
-        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-        <span class="text-xs uppercase tracking-widest text-muted">Agenda Abierta</span>
+  <!-- HERO -->
+  <section class="min-h-screen flex items-end pb-20 pt-32 px-6 relative overflow-hidden bg-white">
+    <div class="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-gray-100 via-transparent to-transparent opacity-50"></div>
+    
+    <div class="max-w-5xl mx-auto w-full relative z-10">
+      <div class="mb-8 reveal-section">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Establecidos en 1998</span>
       </div>
-      <h1 class="font-display font-bold text-6xl md:text-9xl leading-[0.9] mb-8">
-        TU CUERPO <br> <span class="text-outline">ES EL LIENZO.</span>
+
+      <h1 class="font-black text-7xl md:text-9xl leading-[0.9] tracking-tighter mb-8 text-ink reveal-section">
+        ARTE EN<br>
+        TU PIEL.
       </h1>
-      <p class="text-lg md:text-xl text-muted max-w-lg mb-12">
-        Especialistas en transformar historias en arte permanente. Higiene clínica, diseño de autor y precisión milimétrica.
+
+      <p class="text-gray-500 text-xl leading-relaxed max-w-lg mb-12 reveal-section">
+        25 años transformando ideas en arte permanente. Higiene clínica, diseño de autor y precisión milimétrica.
       </p>
-      <div class="flex gap-4">
-        <a href="#contact" class="btn-primary px-8 py-4 rounded-lg text-sm uppercase tracking-wider flex items-center gap-2">
-          Agendar Cita <i class="ph-bold ph-arrow-right"></i>
-        </a>
+
+      <div class="flex flex-wrap gap-4 reveal-section">
+        <a href="#contact" class="btn-black px-8 py-4 text-sm">Agenda tu Cita</a>
+        <a href="#gallery" class="btn-ghost px-8 py-4 text-sm">Ver Galería</a>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex gap-12 mt-20 border-t border-gray-100 pt-8 reveal-section">
+          <div>
+              <p class="font-black text-3xl">+2500</p>
+              <p class="text-xs uppercase text-gray-400 font-bold">Tatuajes</p>
+          </div>
+          <div>
+            <p class="font-black text-3xl">25</p>
+            <p class="text-xs uppercase text-gray-400 font-bold">Años exp.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- GALERIA -->
-  <section id="gallery" class="py-24 px-6 md:px-20 border-t border-white/5 bg-card/30">
-    <h2 class="font-display text-4xl md:text-5xl font-bold mb-12">Obras Recientes</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="h-96 bg-[#1a1a1a] rounded-xl relative group interactive-card overflow-hidden">
-        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10"><span class="font-display text-2xl font-bold">Realismo</span></div>
-        <div class="w-full h-full bg-gradient-to-br from-gray-800 to-black opacity-50"></div>
-      </div>
-      <div class="h-96 bg-[#1a1a1a] rounded-xl relative group interactive-card overflow-hidden md:mt-12">
-        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10"><span class="font-display text-2xl font-bold">Blackwork</span></div>
-        <div class="w-full h-full bg-gradient-to-br from-gray-800 to-black opacity-50"></div>
-      </div>
-      <div class="h-96 bg-[#1a1a1a] rounded-xl relative group interactive-card overflow-hidden">
-        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 z-10"><span class="font-display text-2xl font-bold">Japonés</span></div>
-        <div class="w-full h-full bg-gradient-to-br from-gray-800 to-black opacity-50"></div>
-      </div>
+  <section id="gallery" class="py-24 px-6 bg-surface">
+    <div class="max-w-5xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 block mb-2">01 — Galería</span>
+                <h2 class="font-black text-5xl md:text-6xl tracking-tight">Nuestro Trabajo</h2>
+            </div>
+            <p class="text-gray-500 max-w-xs mt-4 md:mt-0">Cada diseño es único e irrepetible, creado para adaptarse a la anatomía del cliente.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[800px] md:h-[600px]">
+            <!-- Item 1 -->
+            <div class="bg-white rounded-2xl p-6 relative group overflow-hidden border border-gray-200 reveal-section">
+                <div class="absolute inset-0 bg-gray-100 transition-transform duration-500 group-hover:scale-105"></div>
+                <div class="absolute bottom-6 left-6 z-10">
+                    <span class="font-black text-2xl">Realismo</span>
+                </div>
+            </div>
+             <!-- Item 2 (Grande) -->
+             <div class="md:col-span-2 bg-black rounded-2xl p-6 relative group overflow-hidden border border-gray-200 reveal-section text-white">
+                <div class="absolute inset-0 bg-neutral-900 transition-transform duration-500 group-hover:scale-105"></div>
+                <div class="absolute bottom-6 left-6 z-10">
+                    <span class="font-black text-2xl">Blackwork & Japonés</span>
+                </div>
+            </div>
+             <!-- Item 3 -->
+             <div class="md:col-span-3 bg-white rounded-2xl p-6 relative group overflow-hidden border border-gray-200 reveal-section">
+                <div class="absolute inset-0 bg-gray-200 transition-transform duration-500 group-hover:scale-105"></div>
+                <div class="absolute bottom-6 left-6 z-10">
+                    <span class="font-black text-2xl">Geometría y Línea Fina</span>
+                </div>
+            </div>
+        </div>
     </div>
   </section>
 
-  <!-- INFO -->
-  <section class="py-24 px-6 md:px-20">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-      <div>
-        <h2 class="font-display text-4xl font-bold mb-6">Estándares Clínicos.</h2>
-        <p class="text-muted text-lg mb-8">No solo hacemos arte, cuidamos tu salud. Materiales desechables de grado médico y tintas veganas.</p>
-        <ul class="space-y-4">
-            <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-white"></i> Esterilización Hospitalaria</li>
-            <li class="flex items-center gap-3"><i class="ph-fill ph-check-circle text-white"></i> Tintas Orgánicas</li>
-        </ul>
+  <!-- HORARIOS -->
+  <section class="py-24 px-6 bg-white">
+      <div class="max-w-5xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 block mb-2">02 — Disponibilidad</span>
+        <h2 class="font-black text-5xl md:text-6xl tracking-tight mb-12">Horarios</h2>
+        
+        <div class="max-w-2xl">
+            <div class="flex justify-between py-6 border-b border-gray-100 reveal-section">
+                <span class="font-bold text-lg">Lunes — Viernes</span>
+                <span class="text-gray-500">10:00 — 20:00</span>
+            </div>
+            <div class="flex justify-between py-6 border-b border-gray-100 reveal-section">
+                <span class="font-bold text-lg">Sábado</span>
+                <span class="text-gray-500">10:00 — 18:00</span>
+            </div>
+            <div class="flex justify-between py-6 border-b border-gray-100 reveal-section">
+                <span class="font-bold text-lg">Domingo</span>
+                <span class="text-red font-medium">Cerrado</span>
+            </div>
+        </div>
       </div>
-      <div class="interactive-card p-8 rounded-2xl bg-card">
-          <h3 class="font-display text-2xl font-bold mb-6">Cuidados</h3>
-          <ul class="space-y-4 text-sm text-muted">
-              <li class="flex justify-between border-b border-white/5 pb-2"><span>Lavado</span> <span class="text-white">Jabón neutro x3</span></li>
-              <li class="flex justify-between border-b border-white/5 pb-2"><span>Hidratación</span> <span class="text-white">Crema específica</span></li>
-              <li class="flex justify-between pt-2"><span>Tiempo cura</span> <span class="text-white">15 - 20 días</span></li>
-          </ul>
-      </div>
+  </section>
+
+  <!-- CUIDADOS (CARDS) -->
+  <section class="py-24 px-6 bg-surface">
+    <div class="max-w-5xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 block mb-2">03 — Post Tatuaje</span>
+        <h2 class="font-black text-5xl md:text-6xl tracking-tight mb-12">Cuidados Esenciales</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="card p-6 reveal-section">
+                <span class="text-4xl font-black text-gray-100 block mb-4">01</span>
+                <h3 class="font-bold text-sm mb-2">Limpieza</h3>
+                <p class="text-xs text-gray-500">Jabón neutro 3 veces al día.</p>
+            </div>
+            <div class="card p-6 reveal-section">
+                <span class="text-4xl font-black text-gray-100 block mb-4">02</span>
+                <h3 class="font-bold text-sm mb-2">Hidratación</h3>
+                <p class="text-xs text-gray-500">Capa fina de crema especial.</p>
+            </div>
+            <div class="card p-6 reveal-section">
+                <span class="text-4xl font-black text-gray-100 block mb-4">03</span>
+                <h3 class="font-bold text-sm mb-2">Sin Sol</h3>
+                <p class="text-xs text-gray-500">Evita exposición directa 1 mes.</p>
+            </div>
+            <div class="card p-6 reveal-section">
+                <span class="text-4xl font-black text-gray-100 block mb-4">04</span>
+                <h3 class="font-bold text-sm mb-2">Sin Agua</h3>
+                <p class="text-xs text-gray-500">Nada de piscinas ni mar.</p>
+            </div>
+            <div class="card p-6 reveal-section">
+                <span class="text-4xl font-black text-gray-100 block mb-4">05</span>
+                <h3 class="font-bold text-sm mb-2">No Rascar</h3>
+                <p class="text-xs text-gray-500">Deja caer la costra sola.</p>
+            </div>
+        </div>
     </div>
+  </section>
+
+  <!-- FAQ (ACORDEÓN) -->
+  <section class="py-24 px-6 bg-white">
+      <div class="max-w-3xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 block mb-2">04 — Dudas</span>
+        <h2 class="font-black text-5xl md:text-6xl tracking-tight mb-12">Preguntas Frecuentes</h2>
+
+        <div class="space-y-4">
+            <div class="faq-item border-b border-gray-100 pb-4 reveal-section">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold text-lg" onclick="toggleFaq(this)">
+                    ¿Cuánto cuesta un tatuaje?
+                    <span class="faq-icon text-2xl text-gray-400">+</span>
+                </button>
+                <div class="faq-content text-gray-500 text-sm">
+                    El precio varía según tamaño y detalle. El mínimo de estudio es $50 USD para cubrir material estéril.
+                </div>
+            </div>
+            <div class="faq-item border-b border-gray-100 pb-4 reveal-section">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold text-lg" onclick="toggleFaq(this)">
+                    ¿Duele mucho?
+                    <span class="faq-icon text-2xl text-gray-400">+</span>
+                </button>
+                <div class="faq-content text-gray-500 text-sm">
+                    Depende de la zona, pero es tolerable. Se siente como un rasguño constante sobre la piel.
+                </div>
+            </div>
+            <div class="faq-item border-b border-gray-100 pb-4 reveal-section">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold text-lg" onclick="toggleFaq(this)">
+                    ¿Necesito cita previa?
+                    <span class="faq-icon text-2xl text-gray-400">+</span>
+                </button>
+                <div class="faq-content text-gray-500 text-sm">
+                    Sí, trabajamos exclusivamente con cita para dedicarte el tiempo necesario.
+                </div>
+            </div>
+        </div>
+      </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contact" class="py-32 px-6 bg-ink text-white relative overflow-hidden">
+      <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+      
+      <div class="max-w-5xl mx-auto relative z-10 grid md:grid-cols-2 gap-16 items-center">
+        <div>
+            <h2 class="font-black text-6xl md:text-8xl tracking-tighter mb-6 leading-none">
+                HAGAMOS <br> <span class="text-gray-500">ALGO ÉPICO.</span>
+            </h2>
+            <p class="text-gray-400 mb-8 max-w-sm">Cuéntanos tu idea por WhatsApp y te damos un presupuesto.</p>
+            <a href="https://wa.me/5350172941" class="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-200 transition-colors">
+                Escribir ahora <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+        </div>
+        <div class="space-y-8 border-l border-white/10 pl-8">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-500 block mb-1">WhatsApp</span>
+                <p class="text-xl font-bold">+53 5017 2941</p>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-500 block mb-1">Ubicación</span>
+                <p class="text-xl font-bold">La Habana, Cuba</p>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-500 block mb-1">Email</span>
+                <p class="text-xl font-bold">inkstudio@gmail.com</p>
+            </div>
+        </div>
+      </div>
   </section>
 
   <!-- FOOTER -->
-  <footer id="contact" class="py-20 px-6 md:px-20 bg-card text-center border-t border-white/5">
-    <h2 class="font-display text-[12vw] font-bold leading-none text-white/10 select-none">INK STUDIO</h2>
-    <div class="flex justify-center gap-8 mt-12 text-sm uppercase tracking-widest font-bold">
-        <a href="#" class="hover:text-white text-muted">Instagram</a>
-        <a href="https://wa.me/5350172941" class="hover:text-white text-muted">WhatsApp</a>
-    </div>
-    <p class="mt-12 text-xs text-muted">© 2026 INK STUDIO.</p>
+  <footer class="py-12 px-6 bg-surface border-t border-gray-200">
+      <div class="max-w-5xl mx-auto flex justify-between items-center text-sm">
+          <span class="font-black">INK STUDIO</span>
+          <span class="text-gray-500">© 2026</span>
+      </div>
   </footer>
+
 </div>
 
+<!-- ══════════════════════════════════════
+     SCRIPTS & LOGIC (FIXED)
+══════════════════════════════════════ -->
 <script>
-    // SISTEMA DE SEGURIDAD (FAILSAFE)
-    // Si algo falla, la web se muestra en 3 segundos sí o sí.
+    // 1. REGISTRAR GSAP
+    gsap.registerPlugin(ScrollTrigger);
+
+    // 2. LOGICA DE CARGA (Con Seguridad Anti-Pantalla Negra)
+    window.addEventListener('load', () => {
+        // Animación de la barra de carga
+        gsap.to('#loader-bar', { 
+            width: '100%', 
+            duration: 1.5, 
+            ease: 'power2.inOut',
+            onComplete: checkFirstVisit 
+        });
+    });
+
+    // Seguro de vida: Si en 4 segundos no ha cargado, forzar la entrada
     setTimeout(() => {
         const splash = document.getElementById('splash');
         if (splash && splash.style.display !== 'none') {
-            console.log("Failsafe trigger: Forzando apertura...");
-            openSiteForce();
+            forceOpen();
         }
-    }, 3500);
+    }, 4000);
 
-    function openSiteForce() {
+    function forceOpen() {
         document.getElementById('splash').style.display = 'none';
-        document.getElementById('quiz-container').style.display = 'none';
-        const main = document.getElementById('main-site');
-        main.classList.remove('opacity-0-force');
-        main.classList.add('opacity-100-force');
+        document.getElementById('app').style.display = 'block';
+        initScrollAnimations();
     }
 
-    // LÓGICA PRINCIPAL
-    document.addEventListener('DOMContentLoaded', () => {
-        // Simular carga de barra
-        const bar = document.getElementById('splash-bar');
-        if(bar) bar.style.width = '100%';
-
-        // Verificar localStorage con try-catch (por si está bloqueado)
+    // 3. CONTROL DE NAVEGACIÓN (Quiz vs Web)
+    function checkFirstVisit() {
+        // Comprobar si ya visitó (localStorage)
         let visited = false;
-        try {
-            visited = localStorage.getItem('ink_visited') === 'true';
-        } catch(e) { console.log('Storage access denied'); }
+        try { visited = localStorage.getItem('ink_visited'); } catch(e){}
 
-        setTimeout(() => {
-            if (visited) {
-                skipQuiz();
-            } else {
-                showQuiz();
-            }
-        }, 1500);
-
-        initCanvas();
-    });
-
-    // NAVEGACIÓN DEL QUIZ
-    function showQuiz() {
-        const splash = document.getElementById('splash');
-        const quiz = document.getElementById('quiz-container');
-        
-        splash.style.opacity = '0';
-        setTimeout(() => splash.style.display = 'none', 800);
-
-        quiz.classList.remove('opacity-0-force');
-        quiz.classList.add('opacity-100-force');
+        if(visited) {
+            skipQuiz();
+        } else {
+            // Mostrar Quiz
+            gsap.to('#splash', { opacity: 0, duration: 0.5, onComplete: () => {
+                document.getElementById('splash').style.display = 'none';
+                const quiz = document.getElementById('quiz-container');
+                quiz.style.display = 'flex';
+                // Animación de entrada del quiz
+                gsap.from('#step-1', { opacity: 0, y: 20, duration: 0.5 });
+            }});
+        }
     }
 
-    function nextStep(step) {
-        // Ocultar actual
-        const current = document.querySelector('.quiz-step:not(.hidden-force)');
-        if(current) current.classList.add('hidden-force');
-        
-        // Mostrar siguiente
-        const next = document.getElementById('step-' + step);
-        if(next) {
-            next.classList.remove('hidden-force');
-            // Pequeña animación CSS
-            next.style.opacity = '0';
-            next.style.transform = 'translateY(20px)';
-            requestAnimationFrame(() => {
-                next.style.transition = 'all 0.5s ease';
-                next.style.opacity = '1';
-                next.style.transform = 'translateY(0)';
-            });
-        }
+    // 4. LÓGICA DEL QUIZ
+    function nextStep(stepNum) {
+        const current = document.querySelector('.quiz-step:not(.hidden)');
+        const next = document.getElementById('step-' + stepNum);
+
+        gsap.to(current, { opacity: 0, y: -20, duration: 0.3, onComplete: () => {
+            current.classList.add('hidden');
+            current.style.transform = 'translateY(0)'; // Reset para el futuro
+            
+            next.classList.remove('hidden');
+            gsap.fromTo(next, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
+        }});
     }
 
     function finishQuiz() {
@@ -333,78 +481,42 @@
     function skipQuiz() {
         const splash = document.getElementById('splash');
         const quiz = document.getElementById('quiz-container');
-        const main = document.getElementById('main-site');
+        const app = document.getElementById('app');
 
-        splash.style.opacity = '0';
-        quiz.style.opacity = '0';
-        
-        setTimeout(() => {
+        // Ocultar todo lo previo
+        gsap.to([splash, quiz], { opacity: 0, duration: 0.5, onComplete: () => {
             splash.style.display = 'none';
             quiz.style.display = 'none';
-            main.classList.remove('opacity-0-force');
-            main.classList.add('opacity-100-force');
             
-            // Iniciar scroll suave si la librería cargó
-            if (typeof Lenis !== 'undefined') {
-                const lenis = new Lenis();
-                function raf(time) {
-                    lenis.raf(time);
-                    requestAnimationFrame(raf);
-                }
-                requestAnimationFrame(raf);
-            }
-        }, 500);
+            // Mostrar App
+            app.style.display = 'block';
+            initScrollAnimations();
+        }});
     }
 
-    // CANVAS DE FONDO (PARTÍCULAS)
-    function initCanvas() {
-        const canvas = document.getElementById('bg-canvas');
-        if(!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2;
-                this.alpha = Math.random() * 0.5;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
-            }
-            draw() {
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.3})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        resize();
-        for (let i = 0; i < 40; i++) particles.push(new Particle());
-        
-        function loop() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(loop);
-        }
-        loop();
-        window.addEventListener('resize', resize);
+    // 5. ANIMACIONES DE SCROLL (GSAP ScrollTrigger)
+    function initScrollAnimations() {
+        const sections = document.querySelectorAll('.reveal-section');
+        sections.forEach(section => {
+            gsap.to(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 85%", // Cuando el top del elemento llega al 85% de la pantalla
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+        });
     }
+
+    // 6. FAQ LOGIC
+    function toggleFaq(btn) {
+        const item = btn.parentElement;
+        item.classList.toggle('active');
+    }
+
 </script>
 </body>
 </html>
