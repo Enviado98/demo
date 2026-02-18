@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ink Studio | Tattoo Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700&family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --secondary: #1a1a1a;
+            --accent: #00C2FF;
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --health-blue: #0066FF;
+            --success: #00C851;
+            --shadow: rgba(0, 102, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+
+        .welcome-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .welcome-content {
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .welcome-logo {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--text-light);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Quiz Section */
+        .quiz-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .quiz-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            width: 90%;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .quiz-progress {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--primary);
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        .quiz-question {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            color: var(--secondary);
+            line-height: 1.2;
+            animation: slideInUp 0.5s ease;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            padding: 1.5rem 2rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            animation: slideInUp 0.5s ease backwards;
+        }
+
+        .quiz-option:nth-child(1) { animation-delay: 0.1s; }
+        .quiz-option:nth-child(2) { animation-delay: 0.2s; }
+        .quiz-option:nth-child(3) { animation-delay: 0.3s; }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 102, 255, 0.02);
+            transform: translateX(10px);
+        }
+
+        .quiz-option:active {
+            transform: scale(0.98);
+        }
+
+        .continue-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            z-index: 8000;
+            transform: translateY(-100%);
+            transition: transform 0.4s ease;
+        }
+
+        .continue-banner.show {
+            transform: translateY(0);
+        }
+
+        /* Main Content */
+        .main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+            min-height: 100vh;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg);
+            padding: 2rem 5%;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.open {
+            background: rgba(0, 200, 81, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.closed {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-badge.open .status-dot {
+            background: var(--success);
+        }
+
+        .status-badge.closed .status-dot {
+            background: #FF3B30;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 5%;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--bg);
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+
+        .section-header {
+            padding: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        .section-header:hover {
+            background: rgba(0, 102, 255, 0.02);
+        }
+
+        .section-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover .section-icon {
+            transform: scale(1.1);
+        }
+
+        .section-icon.health {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 194, 255, 0.1));
+            color: var(--health-blue);
+        }
+
+        .section-icon.gallery {
+            background: linear-gradient(135deg, rgba(255, 149, 0, 0.1), rgba(255, 59, 48, 0.1));
+            color: #FF9500;
+        }
+
+        .section-icon.schedule {
+            background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(52, 199, 89, 0.1));
+            color: var(--success);
+        }
+
+        .section-icon.location {
+            background: linear-gradient(135deg, rgba(142, 142, 147, 0.1), rgba(88, 86, 214, 0.1));
+            color: #5856D6;
+        }
+
+        .section-icon.contact {
+            background: linear-gradient(135deg, rgba(0, 194, 255, 0.1), rgba(0, 102, 255, 0.1));
+            color: var(--accent);
+        }
+
+        .section-icon.faq {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.1), rgba(255, 149, 0, 0.1));
+            color: #FFCC00;
+        }
+
+        .section-title-wrapper {
+            flex: 1;
+        }
+
+        .section-title {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--secondary);
+        }
+
+        .section-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .section-arrow {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 102, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .section.active .section-arrow {
+            transform: rotate(180deg);
+            background: var(--primary);
+            color: white;
+        }
+
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section.active .section-content {
+            max-height: 3000px;
+        }
+
+        .section-content-inner {
+            padding: 0 2rem 2rem 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 0;
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #f5f5f7, #e8e8ea);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Schedule Table */
+        .schedule-table {
+            margin-top: 1.5rem;
+        }
+
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .schedule-row:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-day {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .schedule-time {
+            color: var(--text-light);
+        }
+
+        /* Care List */
+        .care-list {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .care-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(0, 102, 255, 0.02);
+            border-radius: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .care-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .care-text {
+            flex: 1;
+        }
+
+        .care-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--secondary);
+        }
+
+        .care-description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* FAQ Items */
+        .faq-list {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .faq-item {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--secondary);
+        }
+
+        .faq-answer {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Contact Buttons */
+        .contact-buttons {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-whatsapp:hover {
+            background: #20BA5A;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-map {
+            background: rgba(0, 102, 255, 0.08);
+            color: var(--primary);
+        }
+
+        .btn-map:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .section-header {
+                padding: 1.5rem;
+            }
+
+            .section-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .section-content-inner {
+                padding: 0 1.5rem 1.5rem 1.5rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .schedule-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .btn {
+                font-size: 1rem;
+            }
+        }
+
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 102, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 102, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <div class="welcome-logo">INK STUDIO</div>
+            <div class="welcome-subtitle">Bienvenido</div>
+        </div>
+    </div>
+
+    <!-- Continue Banner -->
+    <div class="continue-banner" id="continueBanner">
+        ✨ Continuemos donde lo dejaste
+    </div>
+
+    <!-- Quiz Overlay -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-container">
+            <div class="quiz-progress" id="quizProgress"></div>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div class="quiz-options" id="quizOptions"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">INK STUDIO</div>
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Verificando...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Container -->
+        <div class="container">
+            <!-- Gallery Section -->
+            <section class="section" data-section="gallery">
+                <div class="section-header">
+                    <div class="section-icon gallery">🎨</div>
+                    <div class="section-title-wrapper">
+                        <div class="section-title">Galería</div>
+                        <div class="section-subtitle">Nuestros mejores trabajos</div>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="section-content-inner">
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Explora nuestro catálogo de diseños únicos y tatuajes realizados.</p>
+                        <div class="gallery-grid">
+                            <div class="gallery-item">🖼️</div>
+                            <div class="gallery-item">🖼️</div>
+                            <div class="gallery-item">🖼️</div>
+                            <div class="gallery-item">🖼️</div>
+                            <div class="gallery-item">🖼️</div>
+                            <div class="gallery-item">🖼️</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Schedule Section -->
+            <section class="section" data-section="schedule">
+                <div class="section-header">
+                    <div class="section-icon schedule">🕐</div>
+                    <div class="section-title-wrapper">
+                        <div class="section-title">Horarios</div>
+                        <div class="section-subtitle">Cuándo estamos disponibles</div>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="section-content-inner">
+                        <div class="schedule-table">
+                            <div class="schedule-row">
+                                <span class="schedule-day">Lunes - Viernes</span>
+                                <span class="schedule-time">10:00 - 20:00</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="schedule-day">Sábado</span>
+                                <span class="schedule-time">10:00 - 18:00</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="schedule-day">Domingo</span>
+                                <span class="schedule-time">Cerrado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Health Care Section -->
+            <section class="section" data-section="health">
+                <div class="section-header">
+                    <div class="section-icon health">✚</div>
+                    <div class="section-title-wrapper">
+                        <div class="section-title">Cuidados Post-Tatuaje</div>
+                        <div class="section-subtitle">Información de salud importante</div>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="section-content-inner">
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">Sigue estos pasos para una recuperación perfecta de tu tatuaje.</p>
+                        <div class="care-list">
+                            <div class="care-item">
+                                <div class="care-number">1</div>
+                                <div class="care-text">
+                                    <div class="care-title">Mantén limpio</div>
+                                    <div class="care-description">Lava el tatuaje 2-3 veces al día con jabón neutro y agua tibia.</div>
+                                </div>
+                            </div>
+                            <div class="care-item">
+                                <div class="care-number">2</div>
+                                <div class="care-text">
+                                    <div class="care-title">Hidrata constantemente</div>
+                                    <div class="care-description">Aplica crema especializada después de cada lavado durante 2 semanas.</div>
+                                </div>
+                            </div>
+                            <div class="care-item">
+                                <div class="care-number">3</div>
+                                <div class="care-text">
+                                    <div class="care-title">Evita el sol</div>
+                                    <div class="care-description">No expongas tu tatuaje al sol directo durante el primer mes.</div>
+                                </div>
+                            </div>
+                            <div class="care-item">
+                                <div class="care-number">4</div>
+                                <div class="care-text">
+                                    <div class="care-title">No sumerjas en agua</div>
+                                    <div class="care-description">Evita piscinas, mar y baños prolongados por 2 semanas.</div>
+                                </div>
+                            </div>
+                            <div class="care-item">
+                                <div class="care-number">5</div>
+                                <div class="care-text">
+                                    <div class="care-title">No rasques</div>
+                                    <div class="care-description">Aunque pique, nunca rasques. Deja que las costras caigan naturalmente.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="section" data-section="faq">
+                <div class="section-header">
+                    <div class="section-icon faq">💬</div>
+                    <div class="section-title-wrapper">
+                        <div class="section-title">Preguntas Frecuentes</div>
+                        <div class="section-subtitle">Resolvemos tus dudas</div>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="section-content-inner">
+                        <div class="faq-list">
+                            <div class="faq-item">
+                                <div class="faq-question">¿Cuánto cuesta un tatuaje?</div>
+                                <div class="faq-answer">El precio varía según tamaño, detalle y ubicación. Contacta por WhatsApp para presupuesto personalizado.</div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">¿Necesito cita previa?</div>
+                                <div class="faq-answer">Sí, trabajamos con cita previa para garantizar tiempo de calidad para cada cliente.</div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">¿Duele hacerse un tatuaje?</div>
+                                <div class="faq-answer">La sensación varía según la zona. En general es tolerable, similar a un rasguño continuo.</div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">¿Cuánto tarda en sanar?</div>
+                                <div class="faq-answer">La recuperación completa toma 2-4 semanas. La fase crítica son los primeros 10 días.</div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">¿Puedo traer mi diseño?</div>
+                                <div class="faq-answer">¡Por supuesto! También podemos adaptar o crear diseños personalizados para ti.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Location Section -->
+            <section class="section" data-section="location">
+                <div class="section-header">
+                    <div class="section-icon location">📍</div>
+                    <div class="section-title-wrapper">
+                        <div class="section-title">Ubicación</div>
+                        <div class="section-subtitle">Dónde nos encontramos</div>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="section-content-inner">
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Visítanos en nuestro estudio:</p>
+                        <p style="font-weight: 600; font-size: 1.1rem; margin-bottom: 1.5rem;">Calle Ejemplo 123, Ciudad, CP 12345</p>
+                        <a href="https://maps.google.com/?q=Tu+Direccion" target="_blank" class="btn btn-map">
+                            <span>📍</span>
+                            Ver en Google Maps
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="section" data-section="contact">
+                <div class="section-header">
+                    <div class="section-icon contact">💬</div>
+                    <div class="section-title-wrapper">
+                        <div class="section-title">Contacto</div>
+                        <div class="section-subtitle">Hablemos de tu tatuaje</div>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="section-content-inner">
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">¿Tienes una idea? ¿Quieres agendar cita? Contáctanos ahora.</p>
+                        <div class="contact-buttons">
+                            <a href="https://wa.me/1234567890?text=Hola!%20Quiero%20información%20sobre%20tatuajes" target="_blank" class="btn btn-whatsapp">
+                                <span>💬</span>
+                                Enviar WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+        const quizData = [
+            {
+                question: "¿Es tu primer tatuaje?",
+                options: ["Sí, es mi primera vez", "No, ya tengo tatuajes", "Vengo a ver opciones"]
+            },
+            {
+                question: "¿Qué estilo te interesa?",
+                options: ["Realismo", "Tradicional/Old School", "Minimalista/Geométrico"]
+            },
+            {
+                question: "¿Qué tamaño estás buscando?",
+                options: ["Pequeño (5-10cm)", "Mediano (10-20cm)", "Grande (+20cm)"]
+            }
+        ];
+
+        // State Management
+        let currentQuizStep = 0;
+        let quizAnswers = [];
+        let hasCompletedQuiz = false;
+
+        // Load saved state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('inkStudioProgress');
+            if (saved) {
+                const state = JSON.parse(saved);
+                currentQuizStep = state.step || 0;
+                quizAnswers = state.answers || [];
+                hasCompletedQuiz = state.completed || false;
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            const state = {
+                step: currentQuizStep,
+                answers: quizAnswers,
+                completed: hasCompletedQuiz
+            };
+            localStorage.setItem('inkStudioProgress', JSON.stringify(state));
+        }
+
+        // Initialize Quiz
+        function initQuiz() {
+            const progress = document.getElementById('quizProgress');
+            progress.innerHTML = '';
+            
+            for (let i = 0; i < quizData.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i === currentQuizStep) dot.classList.add('active');
+                progress.appendChild(dot);
+            }
+
+            updateQuizContent();
+        }
+
+        // Update Quiz Content
+        function updateQuizContent() {
+            const question = document.getElementById('quizQuestion');
+            const options = document.getElementById('quizOptions');
+            
+            if (currentQuizStep >= quizData.length) {
+                completeQuiz();
+                return;
+            }
+
+            const currentQuestion = quizData[currentQuizStep];
+            question.textContent = currentQuestion.question;
+            
+            options.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.textContent = option;
+                btn.onclick = () => selectOption(option);
+                options.appendChild(btn);
+            });
+        }
+
+        // Select Option
+        function selectOption(answer) {
+            quizAnswers[currentQuizStep] = answer;
+            currentQuizStep++;
+            saveState();
+            
+            setTimeout(() => {
+                initQuiz();
+            }, 300);
+        }
+
+        // Complete Quiz
+        function completeQuiz() {
+            hasCompletedQuiz = true;
+            saveState();
+            
+            document.getElementById('quizOverlay').classList.remove('active');
+            document.getElementById('mainContent').classList.add('visible');
+        }
+
+        // Check Business Hours
+        function updateBusinessStatus() {
+            const now = new Date();
+            const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const currentTime = hour + minute / 60;
+
+            const badge = document.getElementById('statusBadge');
+            const text = document.getElementById('statusText');
+            
+            let isOpen = false;
+
+            // Monday-Friday: 10:00-20:00
+            if (day >= 1 && day <= 5 && currentTime >= 10 && currentTime < 20) {
+                isOpen = true;
+            }
+            // Saturday: 10:00-18:00
+            else if (day === 6 && currentTime >= 10 && currentTime < 18) {
+                isOpen = true;
+            }
+
+            if (isOpen) {
+                badge.className = 'status-badge open';
+                text.textContent = 'Abierto ahora';
+            } else {
+                badge.className = 'status-badge closed';
+                text.textContent = 'Cerrado';
+            }
+        }
+
+        // Toggle Section
+        function toggleSection(section) {
+            const allSections = document.querySelectorAll('.section');
+            const clickedSection = section.closest('.section');
+            
+            allSections.forEach(s => {
+                if (s !== clickedSection) {
+                    s.classList.remove('active');
+                }
+            });
+            
+            clickedSection.classList.toggle('active');
+        }
+
+        // Initialize App
+        function initApp() {
+            loadState();
+
+            // Welcome screen timeout
+            setTimeout(() => {
+                document.getElementById('welcomeScreen').classList.add('fade-out');
+                
+                setTimeout(() => {
+                    if (hasCompletedQuiz) {
+                        // Show continue banner if returning
+                        document.getElementById('continueBanner').classList.add('show');
+                        document.getElementById('mainContent').classList.add('visible');
+                        
+                        setTimeout(() => {
+                            document.getElementById('continueBanner').classList.remove('show');
+                        }, 3000);
+                    } else {
+                        // Show quiz for new visitors
+                        document.getElementById('quizOverlay').classList.add('active');
+                        initQuiz();
+                    }
+                }, 400);
+            }, 2000);
+
+            // Update status
+            updateBusinessStatus();
+            setInterval(updateBusinessStatus, 60000); // Update every minute
+
+            // Section toggles
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.addEventListener('click', () => toggleSection(header));
+            });
+        }
+
+        // Start when page loads
+        window.addEventListener('DOMContentLoaded', initApp);
+
+        // Clear progress (for testing)
+        window.resetProgress = function() {
+            localStorage.removeItem('inkStudioProgress');
+            location.reload();
+        };
+    </script>
+</body>
+</html>
