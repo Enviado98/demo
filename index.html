@@ -3,1091 +3,1064 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ink Studio | Tattoo Shop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700&family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>INK STUDIO — Tattoo & Body Art</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Special+Elite&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0066FF;
-            --secondary: #1a1a1a;
-            --accent: #00C2FF;
-            --bg: #ffffff;
-            --text: #1a1a1a;
-            --text-light: #666666;
-            --border: #e0e0e0;
-            --health-blue: #0066FF;
-            --success: #00C851;
-            --shadow: rgba(0, 102, 255, 0.08);
+            --white: #faf9f7;
+            --off-white: #f2f0ec;
+            --ink: #0d0d0d;
+            --ink-mid: #2a2a2a;
+            --ink-light: #5a5a5a;
+            --ink-faint: #b0aca4;
+            --rule: #d8d4cc;
+            --red: #c0392b;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--white);
+            color: var(--ink);
+            line-height: 1.7;
             overflow-x: hidden;
         }
 
-        /* Welcome Screen */
+        /* ─── WELCOME SCREEN ─── */
         .welcome-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            inset: 0;
+            background: var(--white);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10000;
-            opacity: 1;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.8s ease;
         }
+        .welcome-screen.fade-out { opacity: 0; pointer-events: none; }
 
-        .welcome-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
+        .welcome-rule-top {
+            width: 1px;
+            height: 80px;
+            background: var(--ink);
+            animation: growDown 0.6s ease 0.2s both;
         }
+        @keyframes growDown { from { height: 0; } to { height: 80px; } }
 
-        .welcome-content {
-            text-align: center;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .welcome-logo {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: clamp(3rem, 10vw, 6rem);
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        .welcome-subtitle {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            color: var(--text-light);
-            font-weight: 300;
-            letter-spacing: 0.1em;
+        .welcome-label {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.65rem;
+            letter-spacing: 0.55em;
             text-transform: uppercase;
+            color: var(--ink-light);
+            margin: 1.8rem 0 1rem;
+            animation: fadeUp 0.6s ease 0.5s both;
         }
 
-        /* Quiz Section */
+        .welcome-logo-main {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(5rem, 18vw, 11rem);
+            letter-spacing: 0.12em;
+            line-height: 0.9;
+            color: var(--ink);
+            text-align: center;
+            animation: fadeUp 0.7s ease 0.4s both;
+        }
+
+        .welcome-logo-sub {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1rem, 3vw, 1.6rem);
+            font-weight: 400;
+            color: var(--ink-light);
+            letter-spacing: 0.08em;
+            margin-top: 0.3rem;
+            animation: fadeUp 0.7s ease 0.7s both;
+        }
+
+        .welcome-rule-bottom {
+            width: 60px;
+            height: 1px;
+            background: var(--ink);
+            margin: 2rem 0;
+            animation: growWide 0.6s ease 0.8s both;
+        }
+        @keyframes growWide { from { width: 0; } to { width: 60px; } }
+
+        .welcome-year {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            color: var(--ink-faint);
+            animation: fadeUp 0.6s ease 1s both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── QUIZ OVERLAY ─── */
         .quiz-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
+            inset: 0;
+            background: var(--white);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s ease;
         }
-
-        .quiz-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .quiz-overlay.active { opacity: 1; pointer-events: all; }
 
         .quiz-container {
-            max-width: 600px;
+            max-width: 560px;
             width: 90%;
-            padding: 3rem 2rem;
-            text-align: center;
+        }
+
+        .quiz-issue-label {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 2rem;
         }
 
         .quiz-progress {
             display: flex;
-            gap: 0.5rem;
-            justify-content: center;
             margin-bottom: 3rem;
+            border-bottom: 1px solid var(--rule);
         }
 
         .progress-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--border);
-            transition: all 0.3s ease;
+            height: 2px;
+            flex: 1;
+            background: var(--rule);
+            transition: background 0.4s ease;
         }
-
-        .progress-dot.active {
-            background: var(--primary);
-            width: 30px;
-            border-radius: 5px;
-        }
+        .progress-dot.active { background: var(--ink); }
 
         .quiz-question {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
             font-weight: 700;
-            margin-bottom: 2.5rem;
-            color: var(--secondary);
             line-height: 1.2;
-            animation: slideInUp 0.5s ease;
+            color: var(--ink);
+            margin-bottom: 2.5rem;
+            letter-spacing: -0.01em;
         }
 
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .quiz-options { display: flex; flex-direction: column; }
 
         .quiz-option {
-            padding: 1.5rem 2rem;
-            background: var(--bg);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 500;
+            padding: 1.1rem 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--rule);
+            color: var(--ink-mid);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            font-weight: 300;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
             text-align: left;
-            animation: slideInUp 0.5s ease backwards;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeUp 0.4s ease backwards;
         }
+        .quiz-option:first-child { border-top: 1px solid var(--rule); }
+        .quiz-option:nth-child(1) { animation-delay: 0.05s; }
+        .quiz-option:nth-child(2) { animation-delay: 0.12s; }
+        .quiz-option:nth-child(3) { animation-delay: 0.19s; }
 
-        .quiz-option:nth-child(1) { animation-delay: 0.1s; }
-        .quiz-option:nth-child(2) { animation-delay: 0.2s; }
-        .quiz-option:nth-child(3) { animation-delay: 0.3s; }
+        .quiz-option::after { content: '→'; color: var(--rule); transition: all 0.25s ease; }
+        .quiz-option:hover { color: var(--ink); font-weight: 400; padding-left: 1rem; }
+        .quiz-option:hover::after { color: var(--ink); }
 
-        .quiz-option:hover {
-            border-color: var(--primary);
-            background: rgba(0, 102, 255, 0.02);
-            transform: translateX(10px);
-        }
-
-        .quiz-option:active {
-            transform: scale(0.98);
-        }
-
+        /* ─── CONTINUE BANNER ─── */
         .continue-banner {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            color: white;
-            padding: 0.75rem;
+            top: 0; left: 0; width: 100%;
+            background: var(--ink);
+            color: var(--white);
+            padding: 0.65rem;
             text-align: center;
-            font-weight: 500;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
             z-index: 8000;
             transform: translateY(-100%);
             transition: transform 0.4s ease;
         }
+        .continue-banner.show { transform: translateY(0); }
 
-        .continue-banner.show {
-            transform: translateY(0);
-        }
+        /* ─── MAIN ─── */
+        .main-content { opacity: 0; transition: opacity 0.8s ease; }
+        .main-content.visible { opacity: 1; }
 
-        /* Main Content */
-        .main-content {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
-            min-height: 100vh;
-        }
-
-        .main-content.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Header */
-        .header {
-            background: var(--bg);
-            padding: 2rem 5%;
-            border-bottom: 1px solid var(--border);
+        /* ─── MASTHEAD ─── */
+        .masthead {
+            border-bottom: 3px solid var(--ink);
             position: sticky;
             top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--white);
+            z-index: 100;
         }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
+        .masthead-top {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 5%;
+            border-bottom: 1px solid var(--rule);
         }
 
-        .logo {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .masthead-tag {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
         }
 
         .status-badge {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+        .status-badge.open { color: var(--ink-mid); }
+        .status-badge.closed { color: var(--red); }
+
+        .status-dot { width: 5px; height: 5px; border-radius: 50%; animation: pulse 2s infinite; }
+        .status-badge.open .status-dot { background: var(--ink-mid); }
+        .status-badge.closed .status-dot { background: var(--red); }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+
+        .masthead-main {
+            padding: 1.5rem 5%;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: end;
+            gap: 2rem;
         }
 
-        .status-badge.open {
-            background: rgba(0, 200, 81, 0.1);
-            color: var(--success);
+        .masthead-left {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            color: var(--ink-light);
+            font-weight: 300;
+            line-height: 1.5;
         }
 
-        .status-badge.closed {
-            background: rgba(255, 59, 48, 0.1);
-            color: #FF3B30;
+        .masthead-center { text-align: center; }
+
+        .masthead-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 9vw, 6rem);
+            letter-spacing: 0.15em;
+            line-height: 1;
+            color: var(--ink);
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
+        .masthead-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            margin-top: 0.2rem;
         }
 
-        .status-badge.open .status-dot {
-            background: var(--success);
+        .masthead-right {
+            text-align: right;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            line-height: 2.2;
         }
 
-        .status-badge.closed .status-dot {
-            background: #FF3B30;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 3rem 5%;
-        }
-
-        /* Section */
-        .section {
-            margin-bottom: 2rem;
-            border: 1px solid var(--border);
-            border-radius: 20px;
+        /* ─── HERO ─── */
+        .hero {
+            background: var(--ink);
+            color: var(--white);
+            padding: 5rem 5%;
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
             overflow: hidden;
-            background: var(--bg);
-            transition: all 0.3s ease;
         }
 
-        .section:hover {
-            box-shadow: 0 10px 40px var(--shadow);
+        .hero::after {
+            content: 'INK';
+            position: absolute;
+            right: -3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22rem;
+            color: rgba(255,255,255,0.025);
+            line-height: 1;
+            pointer-events: none;
+            letter-spacing: 0.1em;
         }
 
-        .section-header {
-            padding: 2rem;
-            cursor: pointer;
+        .hero-divider { background: rgba(255,255,255,0.12); }
+
+        .hero-left h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-left h2 em {
+            font-style: italic;
+            font-weight: 400;
+            display: block;
+            font-size: 0.55em;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-left p {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.55);
+            font-weight: 300;
+            line-height: 1.9;
+        }
+
+        .hero-right { padding-left: 2rem; }
+
+        .hero-stat { margin-bottom: 2.5rem; }
+        .hero-stat:last-child { margin-bottom: 0; }
+
+        .hero-stat-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 0.05em;
+            line-height: 1;
+            color: var(--white);
+        }
+
+        .hero-stat-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 0.2rem;
+        }
+
+        /* ─── CONTAINER ─── */
+        .container { max-width: 960px; margin: 0 auto; padding: 0 5%; }
+
+        .section-label-row {
             display: flex;
             align-items: center;
             gap: 1.5rem;
-            user-select: none;
-            transition: background 0.2s ease;
+            padding: 3rem 0 1.5rem;
         }
 
-        .section-header:hover {
-            background: rgba(0, 102, 255, 0.02);
+        .section-label-text {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            white-space: nowrap;
         }
 
-        .section-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            display: flex;
+        .section-label-rule { flex: 1; height: 1px; background: var(--rule); }
+
+        /* ─── ACCORDION ─── */
+        .section { border-top: 1px solid var(--ink); }
+        .section:last-child { border-bottom: 1px solid var(--rule); }
+
+        .section-header {
+            padding: 1.6rem 0;
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: 48px 1fr auto;
             align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
+            gap: 1.5rem;
+            user-select: none;
         }
 
-        .section:hover .section-icon {
-            transform: scale(1.1);
+        .section-index {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.08em;
+            color: var(--ink-faint);
+            transition: color 0.3s;
         }
-
-        .section-icon.health {
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 194, 255, 0.1));
-            color: var(--health-blue);
-        }
-
-        .section-icon.gallery {
-            background: linear-gradient(135deg, rgba(255, 149, 0, 0.1), rgba(255, 59, 48, 0.1));
-            color: #FF9500;
-        }
-
-        .section-icon.schedule {
-            background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(52, 199, 89, 0.1));
-            color: var(--success);
-        }
-
-        .section-icon.location {
-            background: linear-gradient(135deg, rgba(142, 142, 147, 0.1), rgba(88, 86, 214, 0.1));
-            color: #5856D6;
-        }
-
-        .section-icon.contact {
-            background: linear-gradient(135deg, rgba(0, 194, 255, 0.1), rgba(0, 102, 255, 0.1));
-            color: var(--accent);
-        }
-
-        .section-icon.faq {
-            background: linear-gradient(135deg, rgba(255, 204, 0, 0.1), rgba(255, 149, 0, 0.1));
-            color: #FFCC00;
-        }
-
-        .section-title-wrapper {
-            flex: 1;
-        }
+        .section:hover .section-index,
+        .section.active .section-index { color: var(--ink); }
 
         .section-title {
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 1.8rem;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
             font-weight: 700;
-            margin-bottom: 0.25rem;
-            color: var(--secondary);
+            color: var(--ink);
+            letter-spacing: -0.01em;
         }
 
         .section-subtitle {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            font-weight: 400;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: var(--ink-faint);
+            margin-top: 0.15rem;
         }
 
-        .section-arrow {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(0, 102, 255, 0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
-            color: var(--primary);
+        .section-toggle {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            color: var(--ink-light);
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+        .section.active .section-toggle { transform: rotate(45deg); }
+
+        .section-body { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .section.active .section-body { max-height: 3000px; }
+
+        .section-body-inner {
+            padding: 0 0 3rem 63px;
+            border-top: 1px solid var(--rule);
         }
 
-        .section.active .section-arrow {
-            transform: rotate(180deg);
-            background: var(--primary);
-            color: white;
+        .section-intro {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--ink-light);
+            padding: 1.5rem 0 2rem;
+            line-height: 1.7;
+            max-width: 600px;
         }
 
-        .section-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .section.active .section-content {
-            max-height: 3000px;
-        }
-
-        .section-content-inner {
-            padding: 0 2rem 2rem 2rem;
-            border-top: 1px solid var(--border);
-            margin-top: 0;
-        }
-
-        /* Gallery Grid */
+        /* ─── GALLERY ─── */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--rule);
+            border: 1px solid var(--rule);
         }
 
         .gallery-item {
             aspect-ratio: 1;
-            background: linear-gradient(135deg, #f5f5f7, #e8e8ea);
-            border-radius: 12px;
+            background: var(--off-white);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            color: rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.25s ease;
+        }
+        .gallery-item:hover { background: var(--white); }
+
+        .gallery-icon { font-size: 2rem; opacity: 0.12; margin-bottom: 0.5rem; }
+
+        .gallery-caption {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.55rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
         }
 
-        .gallery-item:hover {
-            transform: scale(1.05);
+        .gallery-tag {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 0.5rem;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.5rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            border-top: 1px solid var(--rule);
+            text-align: center;
+            background: var(--white);
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s ease;
         }
+        .gallery-item:hover .gallery-tag { opacity: 1; transform: translateY(0); }
 
-        /* Schedule Table */
-        .schedule-table {
-            margin-top: 1.5rem;
-        }
+        /* ─── SCHEDULE ─── */
+        .schedule-table { border-top: 1px solid var(--rule); }
 
         .schedule-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            padding: 1.1rem 0;
+            border-bottom: 1px solid var(--rule);
+            align-items: baseline;
+        }
+
+        .schedule-day { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1rem; }
+
+        .schedule-time { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; color: var(--ink-light); }
+        .schedule-time.closed { color: var(--red); font-style: normal; font-family: 'Special Elite', cursive; font-size: 0.7rem; letter-spacing: 0.2em; }
+
+        /* ─── CARE LIST ─── */
+        .care-item {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--rule);
+        }
+        .care-item:last-child { border-bottom: none; }
+
+        .care-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; line-height: 1; color: var(--rule); }
+
+        .care-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; }
+
+        .care-desc { font-size: 1rem; color: var(--ink-light); font-weight: 300; line-height: 1.6; }
+
+        /* ─── FAQ ─── */
+        .faq-item { padding: 1.5rem 0; border-bottom: 1px solid var(--rule); }
+        .faq-item:last-child { border-bottom: none; }
+
+        .faq-q { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; }
+
+        .faq-a { font-size: 1rem; color: var(--ink-light); font-weight: 300; line-height: 1.7; }
+
+        /* ─── LOCATION ─── */
+        .location-block {
+            padding: 2rem 0;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .location-label {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 0.5rem;
+        }
+
+        .location-address { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.3rem; }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 2rem;
+            font-family: 'Special Elite', cursive;
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary { background: var(--ink); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+        .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+        .btn-outline:hover { background: var(--ink); color: var(--white); }
+
+        /* ─── CONTACT STRIP ─── */
+        .contact-section {
+            background: var(--off-white);
+            border-top: 3px solid var(--ink);
+            padding: 5rem 5%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: start;
+        }
+
+        .contact-left h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .contact-left h2 em { font-style: italic; font-weight: 400; color: var(--ink-light); }
+
+        .contact-left p { font-size: 1rem; color: var(--ink-light); font-weight: 300; line-height: 1.7; margin-bottom: 2rem; }
+
+        .contact-right { border-left: 1px solid var(--rule); padding-left: 3rem; }
+
+        .contact-detail { margin-bottom: 2rem; }
+        .contact-detail:last-child { margin-bottom: 0; }
+
+        .contact-detail-label {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.55rem;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 0.3rem;
+        }
+
+        .contact-detail-value { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            background: var(--ink);
+            color: rgba(255,255,255,0.35);
+            padding: 2.5rem 5%;
             display: flex;
             justify-content: space-between;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .schedule-row:last-child {
-            border-bottom: none;
-        }
-
-        .schedule-day {
-            font-weight: 600;
-            color: var(--secondary);
-        }
-
-        .schedule-time {
-            color: var(--text-light);
-        }
-
-        /* Care List */
-        .care-list {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .care-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1.25rem;
-            background: rgba(0, 102, 255, 0.02);
-            border-radius: 12px;
-            border-left: 3px solid var(--primary);
-        }
-
-        .care-number {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            flex-shrink: 0;
         }
 
-        .care-text {
-            flex: 1;
+        .footer-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.15em;
+            color: var(--white);
         }
 
-        .care-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            color: var(--secondary);
+        .footer-copy {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
         }
 
-        .care-description {
-            font-size: 0.9rem;
-            color: var(--text-light);
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 700px) {
+            .masthead-main { grid-template-columns: 1fr; text-align: center; }
+            .masthead-left, .masthead-right { display: none; }
+            .hero { grid-template-columns: 1fr; gap: 3rem; }
+            .hero-divider { display: none; }
+            .hero-right { padding-left: 0; }
+            .contact-section { grid-template-columns: 1fr; gap: 2rem; }
+            .contact-right { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 2rem; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-body-inner { padding: 0 0 2.5rem 0; }
+            .section-header { grid-template-columns: 36px 1fr auto; gap: 1rem; }
+            .footer { flex-direction: column; gap: 1rem; text-align: center; }
+            .location-block { grid-template-columns: 1fr; }
         }
 
-        /* FAQ Items */
-        .faq-list {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--white); }
+        ::-webkit-scrollbar-thumb { background: var(--rule); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--ink-light); }
 
-        .faq-item {
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 12px;
-        }
-
-        .faq-question {
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: var(--secondary);
-        }
-
-        .faq-answer {
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* Contact Buttons */
-        .contact-buttons {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            padding: 1.25rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.05rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-        }
-
-        .btn-whatsapp:hover {
-            background: #20BA5A;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
-        }
-
-        .btn-map {
-            background: rgba(0, 102, 255, 0.08);
-            color: var(--primary);
-        }
-
-        .btn-map:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px var(--shadow);
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(1.2);
-            }
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .logo {
-                font-size: 2rem;
-            }
-
-            .section-header {
-                padding: 1.5rem;
-            }
-
-            .section-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 1.5rem;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
-            }
-
-            .section-content-inner {
-                padding: 0 1.5rem 1.5rem 1.5rem;
-            }
-
-            .gallery-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-
-            .schedule-row {
-                flex-direction: column;
-                gap: 0.25rem;
-            }
-
-            .btn {
-                font-size: 1rem;
-            }
-        }
-
-        /* Hide scrollbar but keep functionality */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 102, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 102, 255, 0.4);
-        }
+        ::selection { background: var(--ink); color: var(--white); }
     </style>
 </head>
 <body>
-    <!-- Welcome Screen -->
+
     <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-content">
-            <div class="welcome-logo">INK STUDIO</div>
-            <div class="welcome-subtitle">Bienvenido</div>
-        </div>
+        <div class="welcome-rule-top"></div>
+        <div class="welcome-label">Tattoo & Body Art Studio</div>
+        <div class="welcome-logo-main">INK<br>STUDIO</div>
+        <div class="welcome-logo-sub">Arte que permanece</div>
+        <div class="welcome-rule-bottom"></div>
+        <div class="welcome-year">Est. 1998 &nbsp;·&nbsp; Ciudad, ES</div>
     </div>
 
-    <!-- Continue Banner -->
-    <div class="continue-banner" id="continueBanner">
-        ✨ Continuemos donde lo dejaste
-    </div>
+    <div class="continue-banner" id="continueBanner">Bienvenido de vuelta — continuemos</div>
 
-    <!-- Quiz Overlay -->
     <div class="quiz-overlay" id="quizOverlay">
-        <div class="quiz-container">
-            <div class="quiz-progress" id="quizProgress"></div>
-            <div class="quiz-question" id="quizQuestion"></div>
-            <div class="quiz-options" id="quizOptions"></div>
+        <div class="container">
+            <div class="quiz-container">
+                <div class="quiz-issue-label">Antes de comenzar</div>
+                <div class="quiz-progress" id="quizProgress"></div>
+                <div class="quiz-question" id="quizQuestion"></div>
+                <div class="quiz-options" id="quizOptions"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">INK STUDIO</div>
+
+        <header class="masthead">
+            <div class="masthead-top">
+                <span class="masthead-tag">Tattoo & Body Art · Est. 1998</span>
                 <div class="status-badge" id="statusBadge">
                     <span class="status-dot"></span>
-                    <span id="statusText">Verificando...</span>
+                    <span id="statusText">—</span>
                 </div>
+            </div>
+            <div class="masthead-main">
+                <div class="masthead-left">Arte permanente.<br><em>Cada trazo, una historia.</em></div>
+                <div class="masthead-center">
+                    <div class="masthead-title">INK STUDIO</div>
+                    <div class="masthead-subtitle">Tattoo & Body Art</div>
+                </div>
+                <div class="masthead-right">Lun–Vie 10–20h<br>Sáb 10–18h<br>Cita previa</div>
             </div>
         </header>
 
-        <!-- Container -->
-        <div class="container">
-            <!-- Gallery Section -->
-            <section class="section" data-section="gallery">
-                <div class="section-header">
-                    <div class="section-icon gallery">🎨</div>
-                    <div class="section-title-wrapper">
-                        <div class="section-title">Galería</div>
-                        <div class="section-subtitle">Nuestros mejores trabajos</div>
-                    </div>
-                    <div class="section-arrow">▼</div>
+        <div class="hero">
+            <div class="hero-left">
+                <h2>
+                    <em>Nuestro compromiso</em>
+                    Tu piel es el lienzo.<br>Nosotros, el pincel.
+                </h2>
+                <p>Llevamos más de 25 años creando arte permanente. Cada diseño es trabajado con precisión, dedicación y el respeto que merece una obra única.</p>
+            </div>
+            <div class="hero-divider"></div>
+            <div class="hero-right">
+                <div class="hero-stat">
+                    <div class="hero-stat-number">+2500</div>
+                    <div class="hero-stat-label">Obras realizadas</div>
                 </div>
-                <div class="section-content">
-                    <div class="section-content-inner">
-                        <p style="color: var(--text-light); margin-bottom: 1rem;">Explora nuestro catálogo de diseños únicos y tatuajes realizados.</p>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">25</div>
+                    <div class="hero-stat-label">Años de experiencia</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">5</div>
+                    <div class="hero-stat-label">Artistas especializados</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="section-label-row">
+                <span class="section-label-text">Contenido</span>
+                <div class="section-label-rule"></div>
+            </div>
+
+            <div class="section" data-section="gallery">
+                <div class="section-header">
+                    <div class="section-index">01</div>
+                    <div>
+                        <div class="section-title">Galería de Trabajos</div>
+                        <div class="section-subtitle">Nuestros mejores diseños realizados</div>
+                    </div>
+                    <div class="section-toggle">+</div>
+                </div>
+                <div class="section-body">
+                    <div class="section-body-inner">
+                        <p class="section-intro">Cada obra representa horas de trabajo, conversación y confianza mutua entre artista y cliente.</p>
                         <div class="gallery-grid">
-                            <div class="gallery-item">🖼️</div>
-                            <div class="gallery-item">🖼️</div>
-                            <div class="gallery-item">🖼️</div>
-                            <div class="gallery-item">🖼️</div>
-                            <div class="gallery-item">🖼️</div>
-                            <div class="gallery-item">🖼️</div>
+                            <div class="gallery-item">
+                                <div class="gallery-icon">⚓</div>
+                                <div class="gallery-caption">Añadir foto</div>
+                                <div class="gallery-tag">Old School</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-icon">🌹</div>
+                                <div class="gallery-caption">Añadir foto</div>
+                                <div class="gallery-tag">Realismo</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-icon">◈</div>
+                                <div class="gallery-caption">Añadir foto</div>
+                                <div class="gallery-tag">Blackwork</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-icon">△</div>
+                                <div class="gallery-caption">Añadir foto</div>
+                                <div class="gallery-tag">Geométrico</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-icon">☠</div>
+                                <div class="gallery-caption">Añadir foto</div>
+                                <div class="gallery-tag">Tradicional</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-icon">🐍</div>
+                                <div class="gallery-caption">Añadir foto</div>
+                                <div class="gallery-tag">Neo-trad</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Schedule Section -->
-            <section class="section" data-section="schedule">
+            <div class="section" data-section="schedule">
                 <div class="section-header">
-                    <div class="section-icon schedule">🕐</div>
-                    <div class="section-title-wrapper">
+                    <div class="section-index">02</div>
+                    <div>
                         <div class="section-title">Horarios</div>
                         <div class="section-subtitle">Cuándo estamos disponibles</div>
                     </div>
-                    <div class="section-arrow">▼</div>
+                    <div class="section-toggle">+</div>
                 </div>
-                <div class="section-content">
-                    <div class="section-content-inner">
+                <div class="section-body">
+                    <div class="section-body-inner">
+                        <p class="section-intro">Trabajamos exclusivamente con cita previa para garantizar la dedicación plena que cada cliente merece.</p>
                         <div class="schedule-table">
                             <div class="schedule-row">
-                                <span class="schedule-day">Lunes - Viernes</span>
-                                <span class="schedule-time">10:00 - 20:00</span>
+                                <span class="schedule-day">Lunes — Viernes</span>
+                                <span class="schedule-time">10:00 — 20:00</span>
                             </div>
                             <div class="schedule-row">
                                 <span class="schedule-day">Sábado</span>
-                                <span class="schedule-time">10:00 - 18:00</span>
+                                <span class="schedule-time">10:00 — 18:00</span>
                             </div>
                             <div class="schedule-row">
                                 <span class="schedule-day">Domingo</span>
-                                <span class="schedule-time">Cerrado</span>
+                                <span class="schedule-time closed">Cerrado</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Health Care Section -->
-            <section class="section" data-section="health">
+            <div class="section" data-section="health">
                 <div class="section-header">
-                    <div class="section-icon health">✚</div>
-                    <div class="section-title-wrapper">
+                    <div class="section-index">03</div>
+                    <div>
                         <div class="section-title">Cuidados Post-Tatuaje</div>
-                        <div class="section-subtitle">Información de salud importante</div>
+                        <div class="section-subtitle">Protocolo de recuperación</div>
                     </div>
-                    <div class="section-arrow">▼</div>
+                    <div class="section-toggle">+</div>
                 </div>
-                <div class="section-content">
-                    <div class="section-content-inner">
-                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">Sigue estos pasos para una recuperación perfecta de tu tatuaje.</p>
+                <div class="section-body">
+                    <div class="section-body-inner">
+                        <p class="section-intro">La calidad de un tatuaje no depende solo del artista. Tu cuidado define el resultado final.</p>
                         <div class="care-list">
                             <div class="care-item">
-                                <div class="care-number">1</div>
-                                <div class="care-text">
+                                <div class="care-num">01</div>
+                                <div>
                                     <div class="care-title">Mantén limpio</div>
-                                    <div class="care-description">Lava el tatuaje 2-3 veces al día con jabón neutro y agua tibia.</div>
+                                    <div class="care-desc">Lava el tatuaje 2–3 veces al día con jabón neutro y agua tibia los primeros días.</div>
                                 </div>
                             </div>
                             <div class="care-item">
-                                <div class="care-number">2</div>
-                                <div class="care-text">
+                                <div class="care-num">02</div>
+                                <div>
                                     <div class="care-title">Hidrata constantemente</div>
-                                    <div class="care-description">Aplica crema especializada después de cada lavado durante 2 semanas.</div>
+                                    <div class="care-desc">Aplica crema especializada después de cada lavado durante al menos 2 semanas.</div>
                                 </div>
                             </div>
                             <div class="care-item">
-                                <div class="care-number">3</div>
-                                <div class="care-text">
-                                    <div class="care-title">Evita el sol</div>
-                                    <div class="care-description">No expongas tu tatuaje al sol directo durante el primer mes.</div>
+                                <div class="care-num">03</div>
+                                <div>
+                                    <div class="care-title">Evita la exposición solar</div>
+                                    <div class="care-desc">No expongas el tatuaje al sol directo durante el primer mes. Los colores se verán afectados.</div>
                                 </div>
                             </div>
                             <div class="care-item">
-                                <div class="care-number">4</div>
-                                <div class="care-text">
-                                    <div class="care-title">No sumerjas en agua</div>
-                                    <div class="care-description">Evita piscinas, mar y baños prolongados por 2 semanas.</div>
+                                <div class="care-num">04</div>
+                                <div>
+                                    <div class="care-title">Sin agua prolongada</div>
+                                    <div class="care-desc">Evita piscinas, mar y baños prolongados un mínimo de 2 semanas.</div>
                                 </div>
                             </div>
                             <div class="care-item">
-                                <div class="care-number">5</div>
-                                <div class="care-text">
+                                <div class="care-num">05</div>
+                                <div>
                                     <div class="care-title">No rasques</div>
-                                    <div class="care-description">Aunque pique, nunca rasques. Deja que las costras caigan naturalmente.</div>
+                                    <div class="care-desc">Aunque pique, nunca rasques. Deja que las costras caigan de forma natural.</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- FAQ Section -->
-            <section class="section" data-section="faq">
+            <div class="section" data-section="faq">
                 <div class="section-header">
-                    <div class="section-icon faq">💬</div>
-                    <div class="section-title-wrapper">
+                    <div class="section-index">04</div>
+                    <div>
                         <div class="section-title">Preguntas Frecuentes</div>
-                        <div class="section-subtitle">Resolvemos tus dudas</div>
+                        <div class="section-subtitle">Todo lo que necesitas saber</div>
                     </div>
-                    <div class="section-arrow">▼</div>
+                    <div class="section-toggle">+</div>
                 </div>
-                <div class="section-content">
-                    <div class="section-content-inner">
+                <div class="section-body">
+                    <div class="section-body-inner">
                         <div class="faq-list">
                             <div class="faq-item">
-                                <div class="faq-question">¿Cuánto cuesta un tatuaje?</div>
-                                <div class="faq-answer">El precio varía según tamaño, detalle y ubicación. Contacta por WhatsApp para presupuesto personalizado.</div>
+                                <div class="faq-q">¿Cuánto cuesta un tatuaje?</div>
+                                <div class="faq-a">El precio varía según tamaño, detalle y ubicación. Contáctanos para un presupuesto personalizado sin compromiso.</div>
                             </div>
                             <div class="faq-item">
-                                <div class="faq-question">¿Necesito cita previa?</div>
-                                <div class="faq-answer">Sí, trabajamos con cita previa para garantizar tiempo de calidad para cada cliente.</div>
+                                <div class="faq-q">¿Necesito cita previa?</div>
+                                <div class="faq-a">Sí. Trabajamos exclusivamente con cita para dedicar el tiempo y la atención que cada proyecto merece.</div>
                             </div>
                             <div class="faq-item">
-                                <div class="faq-question">¿Duele hacerse un tatuaje?</div>
-                                <div class="faq-answer">La sensación varía según la zona. En general es tolerable, similar a un rasguño continuo.</div>
+                                <div class="faq-q">¿Duele hacerse un tatuaje?</div>
+                                <div class="faq-a">La sensación varía según la zona. En general es tolerable y la mayoría lo describe como un rasguño continuo.</div>
                             </div>
                             <div class="faq-item">
-                                <div class="faq-question">¿Cuánto tarda en sanar?</div>
-                                <div class="faq-answer">La recuperación completa toma 2-4 semanas. La fase crítica son los primeros 10 días.</div>
+                                <div class="faq-q">¿Cuánto tarda en sanar?</div>
+                                <div class="faq-a">La recuperación completa toma de 2 a 4 semanas. Los primeros 10 días son los más críticos.</div>
                             </div>
                             <div class="faq-item">
-                                <div class="faq-question">¿Puedo traer mi diseño?</div>
-                                <div class="faq-answer">¡Por supuesto! También podemos adaptar o crear diseños personalizados para ti.</div>
+                                <div class="faq-q">¿Puedo traer mi propio diseño?</div>
+                                <div class="faq-a">Por supuesto. También creamos diseños completamente originales partiendo de tus ideas.</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Location Section -->
-            <section class="section" data-section="location">
+            <div class="section" data-section="location">
                 <div class="section-header">
-                    <div class="section-icon location">📍</div>
-                    <div class="section-title-wrapper">
+                    <div class="section-index">05</div>
+                    <div>
                         <div class="section-title">Ubicación</div>
                         <div class="section-subtitle">Dónde nos encontramos</div>
                     </div>
-                    <div class="section-arrow">▼</div>
+                    <div class="section-toggle">+</div>
                 </div>
-                <div class="section-content">
-                    <div class="section-content-inner">
-                        <p style="color: var(--text-light); margin-bottom: 1rem;">Visítanos en nuestro estudio:</p>
-                        <p style="font-weight: 600; font-size: 1.1rem; margin-bottom: 1.5rem;">Calle Ejemplo 123, Ciudad, CP 12345</p>
-                        <a href="https://maps.google.com/?q=Tu+Direccion" target="_blank" class="btn btn-map">
-                            <span>📍</span>
-                            Ver en Google Maps
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Contact Section -->
-            <section class="section" data-section="contact">
-                <div class="section-header">
-                    <div class="section-icon contact">💬</div>
-                    <div class="section-title-wrapper">
-                        <div class="section-title">Contacto</div>
-                        <div class="section-subtitle">Hablemos de tu tatuaje</div>
-                    </div>
-                    <div class="section-arrow">▼</div>
-                </div>
-                <div class="section-content">
-                    <div class="section-content-inner">
-                        <p style="color: var(--text-light); margin-bottom: 1.5rem;">¿Tienes una idea? ¿Quieres agendar cita? Contáctanos ahora.</p>
-                        <div class="contact-buttons">
-                            <a href="https://wa.me/1234567890?text=Hola!%20Quiero%20información%20sobre%20tatuajes" target="_blank" class="btn btn-whatsapp">
-                                <span>💬</span>
-                                Enviar WhatsApp
-                            </a>
+                <div class="section-body">
+                    <div class="section-body-inner">
+                        <div class="location-block">
+                            <div>
+                                <div class="location-label">Dirección del estudio</div>
+                                <div class="location-address">Calle Ejemplo 123,<br>Ciudad, CP 12345</div>
+                            </div>
+                            <a href="https://maps.google.com/?q=Tu+Direccion" target="_blank" class="btn btn-outline">Ver en Maps →</a>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
+
+        <div class="contact-section">
+            <div class="contact-left">
+                <h2>¿Tienes una idea<br><em>en mente?</em></h2>
+                <p>Cuéntanos lo que imaginas. Nuestros artistas estudiarán tu propuesta y te ofrecerán un presupuesto sin compromiso.</p>
+                <a href="https://wa.me/1234567890?text=Hola!%20Quiero%20información%20sobre%20tatuajes" target="_blank" class="btn btn-primary">
+                    Escribir por WhatsApp →
+                </a>
+            </div>
+            <div class="contact-right">
+                <div class="contact-detail">
+                    <div class="contact-detail-label">WhatsApp</div>
+                    <div class="contact-detail-value">+34 123 456 789</div>
+                </div>
+                <div class="contact-detail">
+                    <div class="contact-detail-label">Horario de atención</div>
+                    <div class="contact-detail-value">Lun–Sáb, 10h a 20h</div>
+                </div>
+                <div class="contact-detail">
+                    <div class="contact-detail-label">Ubicación</div>
+                    <div class="contact-detail-value">Calle Ejemplo 123, Ciudad</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-brand">INK STUDIO</div>
+            <div class="footer-copy">© 2025 · Arte permanente · Todos los derechos reservados</div>
+        </footer>
+
     </div>
 
     <script>
-        // Quiz Data
         const quizData = [
-            {
-                question: "¿Es tu primer tatuaje?",
-                options: ["Sí, es mi primera vez", "No, ya tengo tatuajes", "Vengo a ver opciones"]
-            },
-            {
-                question: "¿Qué estilo te interesa?",
-                options: ["Realismo", "Tradicional/Old School", "Minimalista/Geométrico"]
-            },
-            {
-                question: "¿Qué tamaño estás buscando?",
-                options: ["Pequeño (5-10cm)", "Mediano (10-20cm)", "Grande (+20cm)"]
-            }
+            { question: "¿Es tu primer tatuaje?", options: ["Sí, es mi primera vez", "No, ya tengo tatuajes", "Solo quiero ver opciones"] },
+            { question: "¿Qué estilo te interesa?", options: ["Realismo", "Tradicional / Old School", "Minimalista / Geométrico"] },
+            { question: "¿Qué tamaño buscas?", options: ["Pequeño (5–10 cm)", "Mediano (10–20 cm)", "Grande (más de 20 cm)"] }
         ];
 
-        // State Management
-        let currentQuizStep = 0;
-        let quizAnswers = [];
-        let hasCompletedQuiz = false;
+        let step = 0, answers = [], completed = false;
 
-        // Load saved state from localStorage
         function loadState() {
-            const saved = localStorage.getItem('inkStudioProgress');
-            if (saved) {
-                const state = JSON.parse(saved);
-                currentQuizStep = state.step || 0;
-                quizAnswers = state.answers || [];
-                hasCompletedQuiz = state.completed || false;
-            }
+            try {
+                const s = JSON.parse(localStorage.getItem('inkStudio_v4') || '{}');
+                step = s.step || 0; answers = s.answers || []; completed = s.completed || false;
+            } catch(e) {}
         }
 
-        // Save state to localStorage
         function saveState() {
-            const state = {
-                step: currentQuizStep,
-                answers: quizAnswers,
-                completed: hasCompletedQuiz
-            };
-            localStorage.setItem('inkStudioProgress', JSON.stringify(state));
+            localStorage.setItem('inkStudio_v4', JSON.stringify({ step, answers, completed }));
         }
 
-        // Initialize Quiz
-        function initQuiz() {
-            const progress = document.getElementById('quizProgress');
-            progress.innerHTML = '';
-            
-            for (let i = 0; i < quizData.length; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'progress-dot';
-                if (i === currentQuizStep) dot.classList.add('active');
-                progress.appendChild(dot);
-            }
+        function renderQuiz() {
+            const prog = document.getElementById('quizProgress');
+            prog.innerHTML = '';
+            quizData.forEach((_, i) => {
+                const d = document.createElement('div');
+                d.className = 'progress-dot' + (i <= step ? ' active' : '');
+                prog.appendChild(d);
+            });
 
-            updateQuizContent();
-        }
+            if (step >= quizData.length) { finishQuiz(); return; }
 
-        // Update Quiz Content
-        function updateQuizContent() {
-            const question = document.getElementById('quizQuestion');
-            const options = document.getElementById('quizOptions');
-            
-            if (currentQuizStep >= quizData.length) {
-                completeQuiz();
-                return;
-            }
-
-            const currentQuestion = quizData[currentQuizStep];
-            question.textContent = currentQuestion.question;
-            
-            options.innerHTML = '';
-            currentQuestion.options.forEach((option, index) => {
+            document.getElementById('quizQuestion').textContent = quizData[step].question;
+            const opts = document.getElementById('quizOptions');
+            opts.innerHTML = '';
+            quizData[step].options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'quiz-option';
-                btn.textContent = option;
-                btn.onclick = () => selectOption(option);
-                options.appendChild(btn);
+                btn.textContent = opt;
+                btn.onclick = () => { answers[step] = opt; step++; saveState(); setTimeout(renderQuiz, 220); };
+                opts.appendChild(btn);
             });
         }
 
-        // Select Option
-        function selectOption(answer) {
-            quizAnswers[currentQuizStep] = answer;
-            currentQuizStep++;
-            saveState();
-            
-            setTimeout(() => {
-                initQuiz();
-            }, 300);
-        }
-
-        // Complete Quiz
-        function completeQuiz() {
-            hasCompletedQuiz = true;
-            saveState();
-            
+        function finishQuiz() {
+            completed = true; saveState();
             document.getElementById('quizOverlay').classList.remove('active');
             document.getElementById('mainContent').classList.add('visible');
         }
 
-        // Check Business Hours
-        function updateBusinessStatus() {
-            const now = new Date();
-            const day = now.getDay(); // 0 = Sunday, 6 = Saturday
-            const hour = now.getHours();
-            const minute = now.getMinutes();
-            const currentTime = hour + minute / 60;
-
-            const badge = document.getElementById('statusBadge');
-            const text = document.getElementById('statusText');
-            
-            let isOpen = false;
-
-            // Monday-Friday: 10:00-20:00
-            if (day >= 1 && day <= 5 && currentTime >= 10 && currentTime < 20) {
-                isOpen = true;
-            }
-            // Saturday: 10:00-18:00
-            else if (day === 6 && currentTime >= 10 && currentTime < 18) {
-                isOpen = true;
-            }
-
-            if (isOpen) {
-                badge.className = 'status-badge open';
-                text.textContent = 'Abierto ahora';
-            } else {
-                badge.className = 'status-badge closed';
-                text.textContent = 'Cerrado';
-            }
+        function updateStatus() {
+            const now = new Date(), d = now.getDay(), t = now.getHours() + now.getMinutes() / 60;
+            const open = (d >= 1 && d <= 5 && t >= 10 && t < 20) || (d === 6 && t >= 10 && t < 18);
+            document.getElementById('statusBadge').className = 'status-badge ' + (open ? 'open' : 'closed');
+            document.getElementById('statusText').textContent = open ? 'Abierto ahora' : 'Cerrado';
         }
 
-        // Toggle Section
-        function toggleSection(section) {
-            const allSections = document.querySelectorAll('.section');
-            const clickedSection = section.closest('.section');
-            
-            allSections.forEach(s => {
-                if (s !== clickedSection) {
-                    s.classList.remove('active');
-                }
-            });
-            
-            clickedSection.classList.toggle('active');
-        }
-
-        // Initialize App
-        function initApp() {
+        window.addEventListener('DOMContentLoaded', () => {
             loadState();
 
-            // Welcome screen timeout
             setTimeout(() => {
                 document.getElementById('welcomeScreen').classList.add('fade-out');
-                
                 setTimeout(() => {
-                    if (hasCompletedQuiz) {
-                        // Show continue banner if returning
-                        document.getElementById('continueBanner').classList.add('show');
+                    if (completed) {
                         document.getElementById('mainContent').classList.add('visible');
-                        
-                        setTimeout(() => {
-                            document.getElementById('continueBanner').classList.remove('show');
-                        }, 3000);
+                        const b = document.getElementById('continueBanner');
+                        b.classList.add('show');
+                        setTimeout(() => b.classList.remove('show'), 3000);
                     } else {
-                        // Show quiz for new visitors
                         document.getElementById('quizOverlay').classList.add('active');
-                        initQuiz();
+                        renderQuiz();
                     }
-                }, 400);
-            }, 2000);
+                }, 600);
+            }, 2400);
 
-            // Update status
-            updateBusinessStatus();
-            setInterval(updateBusinessStatus, 60000); // Update every minute
+            updateStatus();
+            setInterval(updateStatus, 60000);
 
-            // Section toggles
-            document.querySelectorAll('.section-header').forEach(header => {
-                header.addEventListener('click', () => toggleSection(header));
+            document.querySelectorAll('.section-header').forEach(h => {
+                h.addEventListener('click', () => {
+                    const s = h.closest('.section');
+                    document.querySelectorAll('.section').forEach(x => { if (x !== s) x.classList.remove('active'); });
+                    s.classList.toggle('active');
+                });
             });
-        }
+        });
 
-        // Start when page loads
-        window.addEventListener('DOMContentLoaded', initApp);
-
-        // Clear progress (for testing)
-        window.resetProgress = function() {
-            localStorage.removeItem('inkStudioProgress');
-            location.reload();
-        };
+        window.resetProgress = () => { localStorage.removeItem('inkStudio_v4'); location.reload(); };
     </script>
 </body>
-</html>
+                                    </html>
