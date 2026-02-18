@@ -1,1066 +1,989 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INK STUDIO — Tattoo & Body Art</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Special+Elite&family=Bebas+Neue&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --white: #faf9f7;
-            --off-white: #f2f0ec;
-            --ink: #0d0d0d;
-            --ink-mid: #2a2a2a;
-            --ink-light: #5a5a5a;
-            --ink-faint: #b0aca4;
-            --rule: #d8d4cc;
-            --red: #c0392b;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INK STUDIO — Tattoo & Body Art</title>
+<meta name="description" content="Estudio de tatuajes profesional. Arte permanente desde 1998. Cita previa.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter','system-ui','-apple-system','sans-serif'] },
+        colors: {
+          'ink': '#0e0e0e',
+          'ink-mid': '#3a3a3a',
+          'ink-muted': '#86868B',
+          'ink-faint': '#c7c7cc',
+          'surface': '#F5F5F7',
+          'surface-2': '#EBEBF0',
+          'red': '#FF3B30',
+          'green': '#34C759',
         }
-
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            background: var(--white);
-            color: var(--ink);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
-
-        /* ─── WELCOME SCREEN ─── */
-        .welcome-screen {
-            position: fixed;
-            inset: 0;
-            background: var(--white);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.8s ease;
-        }
-        .welcome-screen.fade-out { opacity: 0; pointer-events: none; }
-
-        .welcome-rule-top {
-            width: 1px;
-            height: 80px;
-            background: var(--ink);
-            animation: growDown 0.6s ease 0.2s both;
-        }
-        @keyframes growDown { from { height: 0; } to { height: 80px; } }
-
-        .welcome-label {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.65rem;
-            letter-spacing: 0.55em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            margin: 1.8rem 0 1rem;
-            animation: fadeUp 0.6s ease 0.5s both;
-        }
-
-        .welcome-logo-main {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(5rem, 18vw, 11rem);
-            letter-spacing: 0.12em;
-            line-height: 0.9;
-            color: var(--ink);
-            text-align: center;
-            animation: fadeUp 0.7s ease 0.4s both;
-        }
-
-        .welcome-logo-sub {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: clamp(1rem, 3vw, 1.6rem);
-            font-weight: 400;
-            color: var(--ink-light);
-            letter-spacing: 0.08em;
-            margin-top: 0.3rem;
-            animation: fadeUp 0.7s ease 0.7s both;
-        }
-
-        .welcome-rule-bottom {
-            width: 60px;
-            height: 1px;
-            background: var(--ink);
-            margin: 2rem 0;
-            animation: growWide 0.6s ease 0.8s both;
-        }
-        @keyframes growWide { from { width: 0; } to { width: 60px; } }
-
-        .welcome-year {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.5em;
-            color: var(--ink-faint);
-            animation: fadeUp 0.6s ease 1s both;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ─── QUIZ OVERLAY ─── */
-        .quiz-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-        .quiz-overlay.active { opacity: 1; pointer-events: all; }
-
-        .quiz-container {
-            max-width: 560px;
-            width: 90%;
-        }
-
-        .quiz-issue-label {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.5em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-            margin-bottom: 2rem;
-        }
-
-        .quiz-progress {
-            display: flex;
-            margin-bottom: 3rem;
-            border-bottom: 1px solid var(--rule);
-        }
-
-        .progress-dot {
-            height: 2px;
-            flex: 1;
-            background: var(--rule);
-            transition: background 0.4s ease;
-        }
-        .progress-dot.active { background: var(--ink); }
-
-        .quiz-question {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.8rem, 5vw, 2.6rem);
-            font-weight: 700;
-            line-height: 1.2;
-            color: var(--ink);
-            margin-bottom: 2.5rem;
-            letter-spacing: -0.01em;
-        }
-
-        .quiz-options { display: flex; flex-direction: column; }
-
-        .quiz-option {
-            padding: 1.1rem 0;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--rule);
-            color: var(--ink-mid);
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.15rem;
-            font-weight: 300;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            animation: fadeUp 0.4s ease backwards;
-        }
-        .quiz-option:first-child { border-top: 1px solid var(--rule); }
-        .quiz-option:nth-child(1) { animation-delay: 0.05s; }
-        .quiz-option:nth-child(2) { animation-delay: 0.12s; }
-        .quiz-option:nth-child(3) { animation-delay: 0.19s; }
-
-        .quiz-option::after { content: '→'; color: var(--rule); transition: all 0.25s ease; }
-        .quiz-option:hover { color: var(--ink); font-weight: 400; padding-left: 1rem; }
-        .quiz-option:hover::after { color: var(--ink); }
-
-        /* ─── CONTINUE BANNER ─── */
-        .continue-banner {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            background: var(--ink);
-            color: var(--white);
-            padding: 0.65rem;
-            text-align: center;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.65rem;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            z-index: 8000;
-            transform: translateY(-100%);
-            transition: transform 0.4s ease;
-        }
-        .continue-banner.show { transform: translateY(0); }
-
-        /* ─── MAIN ─── */
-        .main-content { opacity: 0; transition: opacity 0.8s ease; }
-        .main-content.visible { opacity: 1; }
-
-        /* ─── MASTHEAD ─── */
-        .masthead {
-            border-bottom: 3px solid var(--ink);
-            position: sticky;
-            top: 0;
-            background: var(--white);
-            z-index: 100;
-        }
-
-        .masthead-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.7rem 5%;
-            border-bottom: 1px solid var(--rule);
-        }
-
-        .masthead-tag {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-        }
-        .status-badge.open { color: var(--ink-mid); }
-        .status-badge.closed { color: var(--red); }
-
-        .status-dot { width: 5px; height: 5px; border-radius: 50%; animation: pulse 2s infinite; }
-        .status-badge.open .status-dot { background: var(--ink-mid); }
-        .status-badge.closed .status-dot { background: var(--red); }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
-
-        .masthead-main {
-            padding: 1.5rem 5%;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: end;
-            gap: 2rem;
-        }
-
-        .masthead-left {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: clamp(0.8rem, 1.5vw, 1rem);
-            color: var(--ink-light);
-            font-weight: 300;
-            line-height: 1.5;
-        }
-
-        .masthead-center { text-align: center; }
-
-        .masthead-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(3rem, 9vw, 6rem);
-            letter-spacing: 0.15em;
-            line-height: 1;
-            color: var(--ink);
-        }
-
-        .masthead-subtitle {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
-            margin-top: 0.2rem;
-        }
-
-        .masthead-right {
-            text-align: right;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-            line-height: 2.2;
-        }
-
-        /* ─── HERO ─── */
-        .hero {
-            background: var(--ink);
-            color: var(--white);
-            padding: 5rem 5%;
-            display: grid;
-            grid-template-columns: 1fr 1px 1fr;
-            gap: 4rem;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::after {
-            content: 'INK';
-            position: absolute;
-            right: -3rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 22rem;
-            color: rgba(255,255,255,0.025);
-            line-height: 1;
-            pointer-events: none;
-            letter-spacing: 0.1em;
-        }
-
-        .hero-divider { background: rgba(255,255,255,0.12); }
-
-        .hero-left h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            font-weight: 900;
-            line-height: 1.15;
-            letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-left h2 em {
-            font-style: italic;
-            font-weight: 400;
-            display: block;
-            font-size: 0.55em;
-            color: rgba(255,255,255,0.45);
-            margin-bottom: 0.4rem;
-        }
-
-        .hero-left p {
-            font-size: 1.05rem;
-            color: rgba(255,255,255,0.55);
-            font-weight: 300;
-            line-height: 1.9;
-        }
-
-        .hero-right { padding-left: 2rem; }
-
-        .hero-stat { margin-bottom: 2.5rem; }
-        .hero-stat:last-child { margin-bottom: 0; }
-
-        .hero-stat-number {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
-            letter-spacing: 0.05em;
-            line-height: 1;
-            color: var(--white);
-        }
-
-        .hero-stat-label {
-            font-family: 'Cormorant Garamond', serif;
-            font-style: italic;
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.35);
-            margin-top: 0.2rem;
-        }
-
-        /* ─── CONTAINER ─── */
-        .container { max-width: 960px; margin: 0 auto; padding: 0 5%; }
-
-        .section-label-row {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            padding: 3rem 0 1.5rem;
-        }
-
-        .section-label-text {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.5em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-            white-space: nowrap;
-        }
-
-        .section-label-rule { flex: 1; height: 1px; background: var(--rule); }
-
-        /* ─── ACCORDION ─── */
-        .section { border-top: 1px solid var(--ink); }
-        .section:last-child { border-bottom: 1px solid var(--rule); }
-
-        .section-header {
-            padding: 1.6rem 0;
-            cursor: pointer;
-            display: grid;
-            grid-template-columns: 48px 1fr auto;
-            align-items: center;
-            gap: 1.5rem;
-            user-select: none;
-        }
-
-        .section-index {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 0.08em;
-            color: var(--ink-faint);
-            transition: color 0.3s;
-        }
-        .section:hover .section-index,
-        .section.active .section-index { color: var(--ink); }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-            font-weight: 700;
-            color: var(--ink);
-            letter-spacing: -0.01em;
-        }
-
-        .section-subtitle {
-            font-family: 'Cormorant Garamond', serif;
-            font-style: italic;
-            font-size: 0.9rem;
-            color: var(--ink-faint);
-            margin-top: 0.15rem;
-        }
-
-        .section-toggle {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.2rem;
-            color: var(--ink-light);
-            transition: transform 0.3s ease;
-            line-height: 1;
-        }
-        .section.active .section-toggle { transform: rotate(45deg); }
-
-        .section-body { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1); }
-        .section.active .section-body { max-height: 3000px; }
-
-        .section-body-inner {
-            padding: 0 0 3rem 63px;
-            border-top: 1px solid var(--rule);
-        }
-
-        .section-intro {
-            font-family: 'Cormorant Garamond', serif;
-            font-style: italic;
-            font-size: 1.1rem;
-            color: var(--ink-light);
-            padding: 1.5rem 0 2rem;
-            line-height: 1.7;
-            max-width: 600px;
-        }
-
-        /* ─── GALLERY ─── */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: var(--rule);
-            border: 1px solid var(--rule);
-        }
-
-        .gallery-item {
-            aspect-ratio: 1;
-            background: var(--off-white);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: background 0.25s ease;
-        }
-        .gallery-item:hover { background: var(--white); }
-
-        .gallery-icon { font-size: 2rem; opacity: 0.12; margin-bottom: 0.5rem; }
-
-        .gallery-caption {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.55rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-        }
-
-        .gallery-tag {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 0.5rem;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.5rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-            border-top: 1px solid var(--rule);
-            text-align: center;
-            background: var(--white);
-            opacity: 0;
-            transform: translateY(100%);
-            transition: all 0.3s ease;
-        }
-        .gallery-item:hover .gallery-tag { opacity: 1; transform: translateY(0); }
-
-        /* ─── SCHEDULE ─── */
-        .schedule-table { border-top: 1px solid var(--rule); }
-
-        .schedule-row {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            padding: 1.1rem 0;
-            border-bottom: 1px solid var(--rule);
-            align-items: baseline;
-        }
-
-        .schedule-day { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1rem; }
-
-        .schedule-time { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; color: var(--ink-light); }
-        .schedule-time.closed { color: var(--red); font-style: normal; font-family: 'Special Elite', cursive; font-size: 0.7rem; letter-spacing: 0.2em; }
-
-        /* ─── CARE LIST ─── */
-        .care-item {
-            display: grid;
-            grid-template-columns: 40px 1fr;
-            gap: 1.5rem;
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--rule);
-        }
-        .care-item:last-child { border-bottom: none; }
-
-        .care-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; line-height: 1; color: var(--rule); }
-
-        .care-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; }
-
-        .care-desc { font-size: 1rem; color: var(--ink-light); font-weight: 300; line-height: 1.6; }
-
-        /* ─── FAQ ─── */
-        .faq-item { padding: 1.5rem 0; border-bottom: 1px solid var(--rule); }
-        .faq-item:last-child { border-bottom: none; }
-
-        .faq-q { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; }
-
-        .faq-a { font-size: 1rem; color: var(--ink-light); font-weight: 300; line-height: 1.7; }
-
-        /* ─── LOCATION ─── */
-        .location-block {
-            padding: 2rem 0;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .location-label {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-            margin-bottom: 0.5rem;
-        }
-
-        .location-address { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.3rem; }
-
-        /* ─── BUTTONS ─── */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.85rem 2rem;
-            font-family: 'Special Elite', cursive;
-            font-size: 0.65rem;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary { background: var(--ink); color: var(--white); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-
-        .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
-        .btn-outline:hover { background: var(--ink); color: var(--white); }
-
-        /* ─── CONTACT STRIP ─── */
-        .contact-section {
-            background: var(--off-white);
-            border-top: 3px solid var(--ink);
-            padding: 5rem 5%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5rem;
-            align-items: start;
-        }
-
-        .contact-left h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 4vw, 2.8rem);
-            font-weight: 900;
-            line-height: 1.15;
-            letter-spacing: -0.02em;
-            margin-bottom: 1rem;
-        }
-
-        .contact-left h2 em { font-style: italic; font-weight: 400; color: var(--ink-light); }
-
-        .contact-left p { font-size: 1rem; color: var(--ink-light); font-weight: 300; line-height: 1.7; margin-bottom: 2rem; }
-
-        .contact-right { border-left: 1px solid var(--rule); padding-left: 3rem; }
-
-        .contact-detail { margin-bottom: 2rem; }
-        .contact-detail:last-child { margin-bottom: 0; }
-
-        .contact-detail-label {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.55rem;
-            letter-spacing: 0.45em;
-            text-transform: uppercase;
-            color: var(--ink-faint);
-            margin-bottom: 0.3rem;
-        }
-
-        .contact-detail-value { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
-
-        /* ─── FOOTER ─── */
-        .footer {
-            background: var(--ink);
-            color: rgba(255,255,255,0.35);
-            padding: 2.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .footer-brand {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
-            letter-spacing: 0.15em;
-            color: var(--white);
-        }
-
-        .footer-copy {
-            font-family: 'Special Elite', cursive;
-            font-size: 0.6rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-        }
-
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 700px) {
-            .masthead-main { grid-template-columns: 1fr; text-align: center; }
-            .masthead-left, .masthead-right { display: none; }
-            .hero { grid-template-columns: 1fr; gap: 3rem; }
-            .hero-divider { display: none; }
-            .hero-right { padding-left: 0; }
-            .contact-section { grid-template-columns: 1fr; gap: 2rem; }
-            .contact-right { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 2rem; }
-            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-            .section-body-inner { padding: 0 0 2.5rem 0; }
-            .section-header { grid-template-columns: 36px 1fr auto; gap: 1rem; }
-            .footer { flex-direction: column; gap: 1rem; text-align: center; }
-            .location-block { grid-template-columns: 1fr; }
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--white); }
-        ::-webkit-scrollbar-thumb { background: var(--rule); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--ink-light); }
-
-        ::selection { background: var(--ink); color: var(--white); }
-    </style>
+      }
+    }
+  }
+</script>
+
+<style>
+  *,-webkit-font-smoothing:antialiased;
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+
+  body { background: #ffffff; color: #0e0e0e; overflow-x: hidden; }
+
+  /* ── GLASS ── */
+  .glass {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255,255,255,0.45);
+  }
+  .glass-dark {
+    background: rgba(14,14,14,0.82);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: all 0.4s cubic-bezier(.16,1,.3,1);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.09);
+    border-color: rgba(0,0,0,0.1);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(32px) scale(.97); }
+    to   { opacity:1; transform:translateY(0) scale(1); }
+  }
+  @keyframes fadeIn {
+    from { opacity:0; } to { opacity:1; }
+  }
+  @keyframes scaleIn {
+    from { opacity:0; transform:scale(.92); }
+    to   { opacity:1; transform:scale(1); }
+  }
+  @keyframes popIn {
+    0%   { transform:scale(0) rotate(-10deg); }
+    70%  { transform:scale(1.12) rotate(2deg); }
+    100% { transform:scale(1) rotate(0); }
+  }
+  @keyframes shimmerMove {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+  @keyframes float {
+    0%,100% { transform:translateY(0); }
+    50%     { transform:translateY(-10px); }
+  }
+  @keyframes barGrow {
+    from { width:0; } to { width:100%; }
+  }
+  @keyframes pulseDot {
+    0%,100% { opacity:1; } 50% { opacity:.3; }
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .anim-fade    { opacity:0; animation: fadeInUp .7s cubic-bezier(.16,1,.3,1) forwards; }
+  .anim-scale   { opacity:0; animation: scaleIn  .6s cubic-bezier(.16,1,.3,1) forwards; }
+  .anim-slide   { opacity:0; animation: slideUp  .5s cubic-bezier(.16,1,.3,1) forwards; }
+
+  .d1{animation-delay:.08s} .d2{animation-delay:.16s} .d3{animation-delay:.24s}
+  .d4{animation-delay:.32s} .d5{animation-delay:.40s} .d6{animation-delay:.48s}
+
+  .paused { animation-play-state: paused; }
+  .running { animation-play-state: running !important; }
+
+  /* ── PILL / BADGE ── */
+  .pill {
+    background: rgba(0,0,0,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 100px;
+    border: 1px solid rgba(0,0,0,0.07);
+  }
+
+  /* ── BTN ── */
+  .btn-black {
+    background: #0e0e0e;
+    color: #fff;
+    border-radius: 980px;
+    font-weight: 600;
+    transition: all .3s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  }
+  .btn-black:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 32px rgba(0,0,0,0.25); }
+  .btn-black:active { transform:scale(.97); }
+
+  .btn-ghost {
+    background: rgba(0,0,0,0.05);
+    color: #0e0e0e;
+    border-radius: 980px;
+    font-weight: 600;
+    transition: all .3s cubic-bezier(.16,1,.3,1);
+  }
+  .btn-ghost:hover { background:rgba(0,0,0,0.09); transform:translateY(-1px); }
+
+  .btn-red {
+    background: linear-gradient(180deg,#FF4F43 0%,#D93025 100%);
+    color: #fff; border-radius:980px; font-weight:600;
+    transition: all .3s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 4px 16px rgba(255,59,48,.25);
+  }
+  .btn-red:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 28px rgba(255,59,48,.35); }
+
+  /* ── QUIZ CARDS ── */
+  .qcard {
+    border: 1.5px solid rgba(0,0,0,0.08);
+    border-radius: 18px;
+    background: #fff;
+    cursor: pointer;
+    transition: all .35s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .qcard:hover {
+    border-color: #0e0e0e;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(0,0,0,.1);
+  }
+  .qcard:active { transform:scale(.97); }
+  .qcard.chosen {
+    border-color: #0e0e0e;
+    background: #0e0e0e;
+    color: #fff;
+    box-shadow: 0 12px 36px rgba(0,0,0,.2);
+  }
+  .qcard.chosen svg path,
+  .qcard.chosen svg rect,
+  .qcard.chosen svg circle,
+  .qcard.chosen svg ellipse,
+  .qcard.chosen svg line { fill:#fff!important; stroke:#fff!important; }
+  .qcard.chosen .qcard-sub { color:rgba(255,255,255,.5)!important; }
+
+  /* ── PROGRESS BAR ── */
+  .qprog-track { height:2px; background:rgba(0,0,0,.08); border-radius:1px; overflow:hidden; }
+  .qprog-fill  { height:100%; background:#0e0e0e; border-radius:1px; transition:width .6s cubic-bezier(.16,1,.3,1); }
+
+  /* ── SHIMMER ── */
+  .shimmer-wrap { position:relative; overflow:hidden; }
+  .shimmer-wrap::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(90deg,transparent 0%,rgba(255,255,255,.7) 50%,transparent 100%);
+    animation: shimmerMove 2.4s ease infinite;
+  }
+
+  /* ── NAV SCROLLED ── */
+  .nav-scrolled {
+    background: rgba(255,255,255,.82) !important;
+    backdrop-filter: saturate(180%) blur(20px) !important;
+    -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  }
+
+  /* ── GALLERY ── */
+  .gitem {
+    background: #F5F5F7;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .4s cubic-bezier(.16,1,.3,1);
+    border: 1px solid rgba(0,0,0,.05);
+    position: relative;
+  }
+  .gitem:hover { transform:scale(1.03); box-shadow:0 20px 50px rgba(0,0,0,.12); }
+  .gitem:hover .gitem-label { opacity:1; transform:translateY(0); }
+  .gitem-label {
+    position:absolute; bottom:0; left:0; right:0;
+    background: rgba(14,14,14,.75);
+    backdrop-filter: blur(12px);
+    color:#fff; padding:.7rem 1rem;
+    font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    opacity:0; transform:translateY(8px);
+    transition: all .35s cubic-bezier(.16,1,.3,1);
+  }
+
+  /* ── CARE CARD ── */
+  .care-card-hover:hover { border-color:#0e0e0e!important; box-shadow:0 12px 32px rgba(0,0,0,.08); }
+
+  /* ── FAQ ── */
+  .faq-body { max-height:0; overflow:hidden; transition:max-height .5s cubic-bezier(.16,1,.3,1), padding .4s; }
+  .faq-open .faq-body { max-height:200px; padding-bottom:1.2rem; }
+  .faq-icon { transition: transform .4s cubic-bezier(.16,1,.3,1); }
+  .faq-open .faq-icon { transform:rotate(45deg); }
+
+  /* ── SPLASH ── */
+  #splash { transition: opacity .9s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1); }
+  #splash.out { opacity:0; transform:scale(1.05); pointer-events:none; }
+
+  /* ── SCROLL SECTIONS ── */
+  .reveal { opacity:0; transform:translateY(28px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+  .reveal.vis { opacity:1; transform:none; }
+
+  /* ── TOAST ── */
+  #toast { transition: opacity .5s cubic-bezier(.16,1,.3,1), transform .5s cubic-bezier(.16,1,.3,1); }
+
+  /* ── FLOAT ── */
+  .float { animation: float 4s ease-in-out infinite; }
+
+  /* ── GRADIENT BG ── */
+  .gradient-bg {
+    background:
+      radial-gradient(at 20% 20%, rgba(0,0,0,.02) 0, transparent 60%),
+      radial-gradient(at 80% 80%, rgba(0,0,0,.015) 0, transparent 60%),
+      #fff;
+  }
+</style>
 </head>
-<body>
+<body class="antialiased">
 
-    <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-rule-top"></div>
-        <div class="welcome-label">Tattoo & Body Art Studio</div>
-        <div class="welcome-logo-main">INK<br>STUDIO</div>
-        <div class="welcome-logo-sub">Arte que permanece</div>
-        <div class="welcome-rule-bottom"></div>
-        <div class="welcome-year">Est. 1998 &nbsp;·&nbsp; Ciudad, ES</div>
+<!-- ══════════════════════════════════════
+     SPLASH SCREEN
+══════════════════════════════════════ -->
+<div id="splash" class="fixed inset-0 z-[10000] bg-ink flex flex-col items-center justify-center overflow-hidden">
+  <!-- subtle grid lines -->
+  <div class="absolute inset-0 opacity-[0.03]"
+       style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;"></div>
+
+  <p id="splashGreet" class="text-white/40 text-xs font-medium tracking-[.45em] uppercase mb-6 anim-fade" style="font-family:'Inter',sans-serif">
+    Bienvenido
+  </p>
+  <h1 class="text-white font-black text-[clamp(4rem,20vw,10rem)] leading-[.88] tracking-tight text-center anim-fade d1">
+    INK<br>STUDIO
+  </h1>
+  <p class="text-white/35 text-sm font-light tracking-[.12em] mt-4 anim-fade d3">
+    Tattoo &amp; Body Art
+  </p>
+
+  <!-- progress bar -->
+  <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10 overflow-hidden">
+    <div class="h-full bg-white" style="animation:barGrow 2.4s ease forwards;"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     QUIZ FLOW
+══════════════════════════════════════ -->
+<div id="quiz" class="fixed inset-0 z-[9000] bg-white flex items-center justify-center p-6
+     opacity-0 pointer-events-none transition-opacity duration-500">
+
+  <div class="w-full max-w-[660px]" id="quizInner">
+
+    <!-- Step 0 — First time? -->
+    <div class="quiz-step hidden" id="qs0">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 1 de 4</p>
+      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:25%"></div></div>
+      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
+        ¿Es tu<br>primera vez?
+      </h2>
+      <p class="text-ink-muted text-base font-light mb-8">Así te damos la mejor guía posible</p>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="qcard p-7 flex flex-col items-center gap-2 anim-slide" data-q="0" data-v="first" onclick="selectOpt(this,0)">
+          <span class="text-4xl font-black">Sí</span>
+          <span class="qcard-sub text-xs text-ink-muted font-medium tracking-widest uppercase">Primera vez</span>
+        </div>
+        <div class="qcard p-7 flex flex-col items-center gap-2 anim-slide d1" data-q="0" data-v="returning" onclick="selectOpt(this,0)">
+          <span class="text-4xl font-black">No</span>
+          <span class="qcard-sub text-xs text-ink-muted font-medium tracking-widest uppercase">Ya tengo tattoos</span>
+        </div>
+      </div>
+      <div class="mt-7 flex justify-end">
+        <button id="qnext0" onclick="nextStep(1)"
+          class="btn-black px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300"
+          data-btn="0">Continuar →</button>
+      </div>
     </div>
 
-    <div class="continue-banner" id="continueBanner">Bienvenido de vuelta — continuemos</div>
+    <!-- Step 1 — Body part -->
+    <div class="quiz-step hidden" id="qs1">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 2 de 4</p>
+      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:50%"></div></div>
+      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
+        ¿Dónde<br>lo quieres?
+      </h2>
+      <p class="text-ink-muted text-base font-light mb-8">Selecciona la zona del cuerpo</p>
+      <div class="grid grid-cols-3 gap-3">
 
-    <div class="quiz-overlay" id="quizOverlay">
-        <div class="container">
-            <div class="quiz-container">
-                <div class="quiz-issue-label">Antes de comenzar</div>
-                <div class="quiz-progress" id="quizProgress"></div>
-                <div class="quiz-question" id="quizQuestion"></div>
-                <div class="quiz-options" id="quizOptions"></div>
-            </div>
+        <!-- Cabeza -->
+        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="cabeza" onclick="selectOpt(this,1)" style="animation-delay:.05s">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <ellipse cx="22" cy="17" rx="11" ry="13" fill="#0e0e0e"/>
+            <rect x="17" y="29" width="10" height="6" rx="3" fill="#0e0e0e"/>
+            <circle cx="18" cy="15" r="1.8" fill="#fff"/>
+            <circle cx="26" cy="15" r="1.8" fill="#fff"/>
+          </svg>
+          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Cabeza</span>
         </div>
+
+        <!-- Cuello -->
+        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="cuello" onclick="selectOpt(this,1)" style="animation-delay:.10s">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <ellipse cx="22" cy="12" rx="8" ry="9" fill="#0e0e0e"/>
+            <rect x="17" y="20" width="10" height="15" rx="4" fill="#0e0e0e"/>
+          </svg>
+          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Cuello</span>
+        </div>
+
+        <!-- Torso -->
+        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="torso" onclick="selectOpt(this,1)" style="animation-delay:.15s">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <ellipse cx="22" cy="7" rx="7" ry="5" fill="#0e0e0e"/>
+            <rect x="11" y="10" width="22" height="26" rx="5" fill="#0e0e0e"/>
+            <line x1="22" y1="10" x2="22" y2="36" stroke="#fff" stroke-width="1.5"/>
+            <line x1="11" y1="21" x2="33" y2="21" stroke="#fff" stroke-width="1.2"/>
+          </svg>
+          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Torso</span>
+        </div>
+
+        <!-- Brazo -->
+        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="brazo" onclick="selectOpt(this,1)" style="animation-delay:.20s">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="17" y="4" width="10" height="36" rx="5" fill="#0e0e0e"/>
+            <ellipse cx="22" cy="40" rx="5" ry="3.5" fill="#0e0e0e"/>
+          </svg>
+          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Brazo</span>
+        </div>
+
+        <!-- Pierna -->
+        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="pierna" onclick="selectOpt(this,1)" style="animation-delay:.25s">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="15" y="4" width="14" height="20" rx="4" fill="#0e0e0e"/>
+            <rect x="15" y="22" width="6" height="18" rx="3" fill="#0e0e0e"/>
+            <rect x="23" y="22" width="6" height="18" rx="3" fill="#0e0e0e"/>
+          </svg>
+          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Pierna</span>
+        </div>
+
+        <!-- Espalda -->
+        <div class="qcard p-5 flex flex-col items-center gap-2 anim-slide" data-q="1" data-v="espalda" onclick="selectOpt(this,1)" style="animation-delay:.30s">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <ellipse cx="22" cy="7" rx="7" ry="5" fill="#0e0e0e"/>
+            <rect x="11" y="10" width="22" height="26" rx="5" fill="#0e0e0e"/>
+            <line x1="11" y1="20" x2="33" y2="20" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <line x1="11" y1="28" x2="33" y2="28" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2"/>
+          </svg>
+          <span class="qcard-sub text-[.65rem] text-ink-muted font-semibold tracking-wider uppercase">Espalda</span>
+        </div>
+
+      </div>
+      <div class="mt-7 flex justify-end">
+        <button id="qnext1" onclick="nextStep(2)"
+          class="btn-black px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300">Continuar →</button>
+      </div>
     </div>
 
-    <div class="main-content" id="mainContent">
-
-        <header class="masthead">
-            <div class="masthead-top">
-                <span class="masthead-tag">Tattoo & Body Art · Est. 1998</span>
-                <div class="status-badge" id="statusBadge">
-                    <span class="status-dot"></span>
-                    <span id="statusText">—</span>
-                </div>
-            </div>
-            <div class="masthead-main">
-                <div class="masthead-left">Arte permanente.<br><em>Cada trazo, una historia.</em></div>
-                <div class="masthead-center">
-                    <div class="masthead-title">INK STUDIO</div>
-                    <div class="masthead-subtitle">Tattoo & Body Art</div>
-                </div>
-                <div class="masthead-right">Lun–Vie 10–20h<br>Sáb 10–18h<br>Cita previa</div>
-            </div>
-        </header>
-
-        <div class="hero">
-            <div class="hero-left">
-                <h2>
-                    <em>Nuestro compromiso</em>
-                    Tu piel es el lienzo.<br>Nosotros, el pincel.
-                </h2>
-                <p>Llevamos más de 25 años creando arte permanente. Cada diseño es trabajado con precisión, dedicación y el respeto que merece una obra única.</p>
-            </div>
-            <div class="hero-divider"></div>
-            <div class="hero-right">
-                <div class="hero-stat">
-                    <div class="hero-stat-number">+2500</div>
-                    <div class="hero-stat-label">Obras realizadas</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-number">25</div>
-                    <div class="hero-stat-label">Años de experiencia</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-number">5</div>
-                    <div class="hero-stat-label">Artistas especializados</div>
-                </div>
-            </div>
+    <!-- Step 2 — Style -->
+    <div class="quiz-step hidden" id="qs2">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 3 de 4</p>
+      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:75%"></div></div>
+      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
+        ¿Qué<br>estilo?
+      </h2>
+      <p class="text-ink-muted text-base font-light mb-8">Tu estética define el diseño</p>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="qcard p-6 anim-slide" data-q="2" data-v="realismo" onclick="selectOpt(this,2)" style="animation-delay:.05s">
+          <p class="font-black text-xl mb-1">Realismo</p>
+          <p class="qcard-sub text-xs text-ink-muted font-medium">Hyper detallado</p>
         </div>
-
-        <div class="container">
-            <div class="section-label-row">
-                <span class="section-label-text">Contenido</span>
-                <div class="section-label-rule"></div>
-            </div>
-
-            <div class="section" data-section="gallery">
-                <div class="section-header">
-                    <div class="section-index">01</div>
-                    <div>
-                        <div class="section-title">Galería de Trabajos</div>
-                        <div class="section-subtitle">Nuestros mejores diseños realizados</div>
-                    </div>
-                    <div class="section-toggle">+</div>
-                </div>
-                <div class="section-body">
-                    <div class="section-body-inner">
-                        <p class="section-intro">Cada obra representa horas de trabajo, conversación y confianza mutua entre artista y cliente.</p>
-                        <div class="gallery-grid">
-                            <div class="gallery-item">
-                                <div class="gallery-icon">⚓</div>
-                                <div class="gallery-caption">Añadir foto</div>
-                                <div class="gallery-tag">Old School</div>
-                            </div>
-                            <div class="gallery-item">
-                                <div class="gallery-icon">🌹</div>
-                                <div class="gallery-caption">Añadir foto</div>
-                                <div class="gallery-tag">Realismo</div>
-                            </div>
-                            <div class="gallery-item">
-                                <div class="gallery-icon">◈</div>
-                                <div class="gallery-caption">Añadir foto</div>
-                                <div class="gallery-tag">Blackwork</div>
-                            </div>
-                            <div class="gallery-item">
-                                <div class="gallery-icon">△</div>
-                                <div class="gallery-caption">Añadir foto</div>
-                                <div class="gallery-tag">Geométrico</div>
-                            </div>
-                            <div class="gallery-item">
-                                <div class="gallery-icon">☠</div>
-                                <div class="gallery-caption">Añadir foto</div>
-                                <div class="gallery-tag">Tradicional</div>
-                            </div>
-                            <div class="gallery-item">
-                                <div class="gallery-icon">🐍</div>
-                                <div class="gallery-caption">Añadir foto</div>
-                                <div class="gallery-tag">Neo-trad</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" data-section="schedule">
-                <div class="section-header">
-                    <div class="section-index">02</div>
-                    <div>
-                        <div class="section-title">Horarios</div>
-                        <div class="section-subtitle">Cuándo estamos disponibles</div>
-                    </div>
-                    <div class="section-toggle">+</div>
-                </div>
-                <div class="section-body">
-                    <div class="section-body-inner">
-                        <p class="section-intro">Trabajamos exclusivamente con cita previa para garantizar la dedicación plena que cada cliente merece.</p>
-                        <div class="schedule-table">
-                            <div class="schedule-row">
-                                <span class="schedule-day">Lunes — Viernes</span>
-                                <span class="schedule-time">10:00 — 20:00</span>
-                            </div>
-                            <div class="schedule-row">
-                                <span class="schedule-day">Sábado</span>
-                                <span class="schedule-time">10:00 — 18:00</span>
-                            </div>
-                            <div class="schedule-row">
-                                <span class="schedule-day">Domingo</span>
-                                <span class="schedule-time closed">Cerrado</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" data-section="health">
-                <div class="section-header">
-                    <div class="section-index">03</div>
-                    <div>
-                        <div class="section-title">Cuidados Post-Tatuaje</div>
-                        <div class="section-subtitle">Protocolo de recuperación</div>
-                    </div>
-                    <div class="section-toggle">+</div>
-                </div>
-                <div class="section-body">
-                    <div class="section-body-inner">
-                        <p class="section-intro">La calidad de un tatuaje no depende solo del artista. Tu cuidado define el resultado final.</p>
-                        <div class="care-list">
-                            <div class="care-item">
-                                <div class="care-num">01</div>
-                                <div>
-                                    <div class="care-title">Mantén limpio</div>
-                                    <div class="care-desc">Lava el tatuaje 2–3 veces al día con jabón neutro y agua tibia los primeros días.</div>
-                                </div>
-                            </div>
-                            <div class="care-item">
-                                <div class="care-num">02</div>
-                                <div>
-                                    <div class="care-title">Hidrata constantemente</div>
-                                    <div class="care-desc">Aplica crema especializada después de cada lavado durante al menos 2 semanas.</div>
-                                </div>
-                            </div>
-                            <div class="care-item">
-                                <div class="care-num">03</div>
-                                <div>
-                                    <div class="care-title">Evita la exposición solar</div>
-                                    <div class="care-desc">No expongas el tatuaje al sol directo durante el primer mes. Los colores se verán afectados.</div>
-                                </div>
-                            </div>
-                            <div class="care-item">
-                                <div class="care-num">04</div>
-                                <div>
-                                    <div class="care-title">Sin agua prolongada</div>
-                                    <div class="care-desc">Evita piscinas, mar y baños prolongados un mínimo de 2 semanas.</div>
-                                </div>
-                            </div>
-                            <div class="care-item">
-                                <div class="care-num">05</div>
-                                <div>
-                                    <div class="care-title">No rasques</div>
-                                    <div class="care-desc">Aunque pique, nunca rasques. Deja que las costras caigan de forma natural.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" data-section="faq">
-                <div class="section-header">
-                    <div class="section-index">04</div>
-                    <div>
-                        <div class="section-title">Preguntas Frecuentes</div>
-                        <div class="section-subtitle">Todo lo que necesitas saber</div>
-                    </div>
-                    <div class="section-toggle">+</div>
-                </div>
-                <div class="section-body">
-                    <div class="section-body-inner">
-                        <div class="faq-list">
-                            <div class="faq-item">
-                                <div class="faq-q">¿Cuánto cuesta un tatuaje?</div>
-                                <div class="faq-a">El precio varía según tamaño, detalle y ubicación. Contáctanos para un presupuesto personalizado sin compromiso.</div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-q">¿Necesito cita previa?</div>
-                                <div class="faq-a">Sí. Trabajamos exclusivamente con cita para dedicar el tiempo y la atención que cada proyecto merece.</div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-q">¿Duele hacerse un tatuaje?</div>
-                                <div class="faq-a">La sensación varía según la zona. En general es tolerable y la mayoría lo describe como un rasguño continuo.</div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-q">¿Cuánto tarda en sanar?</div>
-                                <div class="faq-a">La recuperación completa toma de 2 a 4 semanas. Los primeros 10 días son los más críticos.</div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-q">¿Puedo traer mi propio diseño?</div>
-                                <div class="faq-a">Por supuesto. También creamos diseños completamente originales partiendo de tus ideas.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" data-section="location">
-                <div class="section-header">
-                    <div class="section-index">05</div>
-                    <div>
-                        <div class="section-title">Ubicación</div>
-                        <div class="section-subtitle">Dónde nos encontramos</div>
-                    </div>
-                    <div class="section-toggle">+</div>
-                </div>
-                <div class="section-body">
-                    <div class="section-body-inner">
-                        <div class="location-block">
-                            <div>
-                                <div class="location-label">Dirección del estudio</div>
-                                <div class="location-address">Calle Ejemplo 123,<br>Ciudad, CP 12345</div>
-                            </div>
-                            <a href="https://maps.google.com/?q=Tu+Direccion" target="_blank" class="btn btn-outline">Ver en Maps →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="qcard p-6 anim-slide" data-q="2" data-v="oldschool" onclick="selectOpt(this,2)" style="animation-delay:.1s">
+          <p class="font-black text-xl mb-1">Old School</p>
+          <p class="qcard-sub text-xs text-ink-muted font-medium">Clásico &amp; atemporal</p>
         </div>
-
-        <div class="contact-section">
-            <div class="contact-left">
-                <h2>¿Tienes una idea<br><em>en mente?</em></h2>
-                <p>Cuéntanos lo que imaginas. Nuestros artistas estudiarán tu propuesta y te ofrecerán un presupuesto sin compromiso.</p>
-                <a href="https://wa.me/1234567890?text=Hola!%20Quiero%20información%20sobre%20tatuajes" target="_blank" class="btn btn-primary">
-                    Escribir por WhatsApp →
-                </a>
-            </div>
-            <div class="contact-right">
-                <div class="contact-detail">
-                    <div class="contact-detail-label">WhatsApp</div>
-                    <div class="contact-detail-value">+34 123 456 789</div>
-                </div>
-                <div class="contact-detail">
-                    <div class="contact-detail-label">Horario de atención</div>
-                    <div class="contact-detail-value">Lun–Sáb, 10h a 20h</div>
-                </div>
-                <div class="contact-detail">
-                    <div class="contact-detail-label">Ubicación</div>
-                    <div class="contact-detail-value">Calle Ejemplo 123, Ciudad</div>
-                </div>
-            </div>
+        <div class="qcard p-6 anim-slide" data-q="2" data-v="blackwork" onclick="selectOpt(this,2)" style="animation-delay:.15s">
+          <p class="font-black text-xl mb-1">Blackwork</p>
+          <p class="qcard-sub text-xs text-ink-muted font-medium">Líneas puras</p>
         </div>
-
-        <footer class="footer">
-            <div class="footer-brand">INK STUDIO</div>
-            <div class="footer-copy">© 2025 · Arte permanente · Todos los derechos reservados</div>
-        </footer>
-
+        <div class="qcard p-6 anim-slide" data-q="2" data-v="geometrico" onclick="selectOpt(this,2)" style="animation-delay:.2s">
+          <p class="font-black text-xl mb-1">Geométrico</p>
+          <p class="qcard-sub text-xs text-ink-muted font-medium">Formas precisas</p>
+        </div>
+      </div>
+      <div class="mt-7 flex justify-end">
+        <button id="qnext2" onclick="nextStep(3)"
+          class="btn-black px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300">Continuar →</button>
+      </div>
     </div>
 
-    <script>
-        const quizData = [
-            { question: "¿Es tu primer tatuaje?", options: ["Sí, es mi primera vez", "No, ya tengo tatuajes", "Solo quiero ver opciones"] },
-            { question: "¿Qué estilo te interesa?", options: ["Realismo", "Tradicional / Old School", "Minimalista / Geométrico"] },
-            { question: "¿Qué tamaño buscas?", options: ["Pequeño (5–10 cm)", "Mediano (10–20 cm)", "Grande (más de 20 cm)"] }
-        ];
+    <!-- Step 3 — Size -->
+    <div class="quiz-step hidden" id="qs3">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2">Paso 4 de 4</p>
+      <div class="qprog-track mb-8"><div class="qprog-fill" style="width:100%"></div></div>
+      <h2 class="font-black text-[clamp(2.2rem,7vw,4.5rem)] leading-[.95] tracking-tight mb-2">
+        ¿Qué<br>tamaño?
+      </h2>
+      <p class="text-ink-muted text-base font-light mb-8">Afecta el precio y el tiempo de sesión</p>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="qcard p-6 flex flex-col items-center gap-3 anim-slide" data-q="3" data-v="pequeno" onclick="selectOpt(this,3)" style="animation-delay:.05s">
+          <div class="w-8 h-8 rounded-full bg-ink-faint"></div>
+          <p class="font-black text-base">Pequeño</p>
+          <p class="qcard-sub text-[.68rem] text-ink-muted">5 – 10 cm</p>
+        </div>
+        <div class="qcard p-6 flex flex-col items-center gap-3 anim-slide" data-q="3" data-v="mediano" onclick="selectOpt(this,3)" style="animation-delay:.1s">
+          <div class="w-12 h-12 rounded-full bg-ink-faint"></div>
+          <p class="font-black text-base">Mediano</p>
+          <p class="qcard-sub text-[.68rem] text-ink-muted">10 – 20 cm</p>
+        </div>
+        <div class="qcard p-6 flex flex-col items-center gap-3 anim-slide" data-q="3" data-v="grande" onclick="selectOpt(this,3)" style="animation-delay:.15s">
+          <div class="w-16 h-16 rounded-full bg-ink-faint"></div>
+          <p class="font-black text-base">Grande</p>
+          <p class="qcard-sub text-[.68rem] text-ink-muted">+20 cm</p>
+        </div>
+      </div>
+      <div class="mt-7 flex justify-end">
+        <button id="qnext3" onclick="showResult()"
+          class="btn-red px-8 py-3 text-sm opacity-0 pointer-events-none transition-all duration-300">Ver mi perfil →</button>
+      </div>
+    </div>
 
-        let step = 0, answers = [], completed = false;
+    <!-- Result -->
+    <div class="quiz-step hidden text-center" id="quizResult">
+      <div class="w-16 h-16 rounded-full bg-ink mx-auto flex items-center justify-center mb-6"
+           style="animation:popIn .5s cubic-bezier(.16,1,.3,1) both">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <polyline points="5,14 11,20 23,8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 id="resultTitle" class="font-black text-4xl tracking-tight mb-3">Todo listo.</h2>
+      <p id="resultSub" class="text-ink-muted font-light text-base leading-relaxed mb-6 max-w-sm mx-auto"></p>
+      <div id="resultTags" class="flex flex-wrap gap-2 justify-center mb-8"></div>
+      <button onclick="enterApp()" class="btn-black px-10 py-3.5 text-sm">Explorar el estudio →</button>
+    </div>
 
-        function loadState() {
-            try {
-                const s = JSON.parse(localStorage.getItem('inkStudio_v4') || '{}');
-                step = s.step || 0; answers = s.answers || []; completed = s.completed || false;
-            } catch(e) {}
-        }
+  </div>
+</div>
 
-        function saveState() {
-            localStorage.setItem('inkStudio_v4', JSON.stringify({ step, answers, completed }));
-        }
 
-        function renderQuiz() {
-            const prog = document.getElementById('quizProgress');
-            prog.innerHTML = '';
-            quizData.forEach((_, i) => {
-                const d = document.createElement('div');
-                d.className = 'progress-dot' + (i <= step ? ' active' : '');
-                prog.appendChild(d);
-            });
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="app" class="opacity-0 transition-opacity duration-700">
 
-            if (step >= quizData.length) { finishQuiz(); return; }
+  <!-- NAV -->
+  <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex justify-between items-center">
+      <a href="#" class="font-black text-lg tracking-tight text-ink">INK STUDIO</a>
+      <div id="navStatus" class="flex items-center gap-2 pill px-4 py-1.5">
+        <div id="navDot" class="w-2 h-2 rounded-full bg-green" style="animation:pulseDot 2s infinite"></div>
+        <span id="navStatusText" class="text-xs font-medium tracking-wide">Abierto</span>
+      </div>
+    </div>
+  </nav>
 
-            document.getElementById('quizQuestion').textContent = quizData[step].question;
-            const opts = document.getElementById('quizOptions');
-            opts.innerHTML = '';
-            quizData[step].options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'quiz-option';
-                btn.textContent = opt;
-                btn.onclick = () => { answers[step] = opt; step++; saveState(); setTimeout(renderQuiz, 220); };
-                opts.appendChild(btn);
-            });
-        }
+  <!-- ── HERO ── -->
+  <section class="min-h-screen flex items-end pb-20 pt-32 px-6 gradient-bg relative overflow-hidden">
+    <!-- big bg word -->
+    <div class="absolute bottom-0 right-0 font-black text-[clamp(8rem,28vw,22rem)] leading-none tracking-tight
+                text-black/[.03] pointer-events-none select-none pr-4">
+      TATTOO
+    </div>
 
-        function finishQuiz() {
-            completed = true; saveState();
-            document.getElementById('quizOverlay').classList.remove('active');
-            document.getElementById('mainContent').classList.add('visible');
-        }
+    <div class="max-w-5xl mx-auto w-full relative z-10">
+      <div class="inline-flex items-center gap-2 pill px-4 py-2 mb-8 anim-fade paused">
+        <div class="w-2 h-2 rounded-full bg-green" style="animation:pulseDot 2s infinite"></div>
+        <span class="text-xs font-medium text-ink-muted tracking-wide">Abiertos para citas · Est. 1998</span>
+      </div>
 
-        function updateStatus() {
-            const now = new Date(), d = now.getDay(), t = now.getHours() + now.getMinutes() / 60;
-            const open = (d >= 1 && d <= 5 && t >= 10 && t < 20) || (d === 6 && t >= 10 && t < 18);
-            document.getElementById('statusBadge').className = 'status-badge ' + (open ? 'open' : 'closed');
-            document.getElementById('statusText').textContent = open ? 'Abierto ahora' : 'Cerrado';
-        }
+      <h1 class="font-black text-[clamp(3.5rem,12vw,9rem)] leading-[.9] tracking-tight mb-6 anim-fade d1 paused">
+        Arte<br>
+        <span class="text-ink-muted font-extralight italic" style="font-size:.72em">en tu</span><br>
+        piel.
+      </h1>
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadState();
+      <p class="text-ink-muted font-light text-lg leading-relaxed max-w-md mb-10 anim-fade d2 paused">
+        25 años transformando ideas en arte permanente. Cada trazo tiene una historia. La tuya está por escribirse.
+      </p>
 
-            setTimeout(() => {
-                document.getElementById('welcomeScreen').classList.add('fade-out');
-                setTimeout(() => {
-                    if (completed) {
-                        document.getElementById('mainContent').classList.add('visible');
-                        const b = document.getElementById('continueBanner');
-                        b.classList.add('show');
-                        setTimeout(() => b.classList.remove('show'), 3000);
-                    } else {
-                        document.getElementById('quizOverlay').classList.add('active');
-                        renderQuiz();
-                    }
-                }, 600);
-            }, 2400);
+      <div class="flex flex-wrap gap-3 anim-fade d3 paused">
+        <a href="#contact" class="btn-black px-8 py-4 text-sm flex items-center gap-2">
+          Agenda tu cita
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#gallery" class="btn-ghost px-8 py-4 text-sm">Ver galería</a>
+      </div>
 
-            updateStatus();
-            setInterval(updateStatus, 60000);
+      <!-- stats row -->
+      <div class="flex flex-wrap gap-8 mt-16 anim-fade d4 paused">
+        <div>
+          <p class="font-black text-3xl tracking-tight">+2500</p>
+          <p class="text-xs text-ink-muted font-medium tracking-wider uppercase mt-0.5">Obras realizadas</p>
+        </div>
+        <div class="w-px bg-black/10"></div>
+        <div>
+          <p class="font-black text-3xl tracking-tight">25</p>
+          <p class="text-xs text-ink-muted font-medium tracking-wider uppercase mt-0.5">Años de experiencia</p>
+        </div>
+        <div class="w-px bg-black/10"></div>
+        <div>
+          <p class="font-black text-3xl tracking-tight">5</p>
+          <p class="text-xs text-ink-muted font-medium tracking-wider uppercase mt-0.5">Artistas</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            document.querySelectorAll('.section-header').forEach(h => {
-                h.addEventListener('click', () => {
-                    const s = h.closest('.section');
-                    document.querySelectorAll('.section').forEach(x => { if (x !== s) x.classList.remove('active'); });
-                    s.classList.toggle('active');
-                });
-            });
-        });
+  <!-- ── GALLERY ── -->
+  <section id="gallery" class="py-24 px-6 bg-surface">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex justify-between items-end mb-12 flex-wrap gap-4">
+        <div>
+          <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">01 — Galería</p>
+          <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight reveal">
+            Nuestro<br><span class="font-extralight italic text-ink-muted">trabajo</span>
+          </h2>
+        </div>
+        <p class="text-ink-muted font-light max-w-xs leading-relaxed reveal">Más de 2,500 obras. Cada una, única e irrepetible.</p>
+      </div>
 
-        window.resetProgress = () => { localStorage.removeItem('inkStudio_v4'); location.reload(); };
-    </script>
+      <!-- gallery grid -->
+      <div class="grid grid-cols-3 gap-2" id="galleryGrid">
+        <div class="gitem aspect-[.75] row-span-2 reveal flex items-center justify-center">
+          <div class="text-center">
+            <div class="text-4xl mb-2 opacity-20">⚓</div>
+            <div class="gitem-label">Old School</div>
+          </div>
+        </div>
+        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.07s">
+          <div class="text-3xl opacity-20">◈</div>
+          <div class="gitem-label">Blackwork</div>
+        </div>
+        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.14s">
+          <div class="text-3xl opacity-20">🌹</div>
+          <div class="gitem-label">Realismo</div>
+        </div>
+        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.21s">
+          <div class="text-3xl opacity-20">△</div>
+          <div class="gitem-label">Geométrico</div>
+        </div>
+        <div class="gitem aspect-[1.2] reveal flex items-center justify-center" style="transition-delay:.28s">
+          <div class="text-3xl opacity-20">🐍</div>
+          <div class="gitem-label">Neo-trad</div>
+        </div>
+      </div>
+      <p class="text-xs text-ink-muted text-center mt-4 tracking-wider font-medium reveal">Toca cada pieza para ver el estilo</p>
+    </div>
+  </section>
+
+  <!-- ── SCHEDULE ── -->
+  <section class="py-24 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">02 — Horarios</p>
+      <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight mb-12 reveal">
+        Cuándo<br><span class="font-extralight italic text-ink-muted">estamos</span>
+      </h2>
+      <div class="max-w-lg">
+        <div class="flex justify-between items-center py-4 border-b border-black/[.06] reveal">
+          <span class="font-semibold text-base">Lunes — Viernes</span>
+          <span class="text-ink-muted font-light text-sm">10:00 — 20:00</span>
+        </div>
+        <div class="flex justify-between items-center py-4 border-b border-black/[.06] reveal" style="transition-delay:.06s">
+          <span class="font-semibold text-base">Sábado</span>
+          <span class="text-ink-muted font-light text-sm">10:00 — 18:00</span>
+        </div>
+        <div class="flex justify-between items-center py-4 reveal" style="transition-delay:.12s">
+          <span class="font-semibold text-base">Domingo</span>
+          <span class="text-red font-medium text-sm">Cerrado</span>
+        </div>
+      </div>
+      <p class="text-sm text-ink-muted font-light mt-8 reveal">Trabajamos exclusivamente con cita previa.</p>
+    </div>
+  </section>
+
+  <!-- ── CARE CARDS ── -->
+  <section class="py-24 px-6 bg-surface">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">03 — Post-tatuaje</p>
+      <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight mb-12 reveal">
+        Cuidados<br><span class="font-extralight italic text-ink-muted">esenciales</span>
+      </h2>
+      <div class="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="card p-6 care-card-hover border border-black/[.06] reveal">
+          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">01</p>
+          <p class="font-semibold text-sm mb-1">Limpieza diaria</p>
+          <p class="text-ink-muted text-xs font-light leading-relaxed">Jabón neutro 2–3 veces al día los primeros días.</p>
+        </div>
+        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.07s">
+          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">02</p>
+          <p class="font-semibold text-sm mb-1">Hidratación</p>
+          <p class="text-ink-muted text-xs font-light leading-relaxed">Crema especializada mínimo 2 semanas.</p>
+        </div>
+        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.14s">
+          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">03</p>
+          <p class="font-semibold text-sm mb-1">Sin sol</p>
+          <p class="text-ink-muted text-xs font-light leading-relaxed">Nada de sol directo el primer mes.</p>
+        </div>
+        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.21s">
+          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">04</p>
+          <p class="font-semibold text-sm mb-1">Sin agua</p>
+          <p class="text-ink-muted text-xs font-light leading-relaxed">Piscinas y mar: espera 2 semanas.</p>
+        </div>
+        <div class="card p-6 care-card-hover border border-black/[.06] reveal" style="transition-delay:.28s">
+          <p class="font-black text-5xl text-black/[.06] mb-4 leading-none">05</p>
+          <p class="font-semibold text-sm mb-1">No rasques</p>
+          <p class="text-ink-muted text-xs font-light leading-relaxed">Deja caer las costras naturalmente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section class="py-24 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs font-semibold tracking-[.4em] uppercase text-ink-muted mb-2 reveal">04 — FAQ</p>
+      <h2 class="font-black text-[clamp(2.5rem,7vw,5rem)] leading-[.92] tracking-tight mb-12 reveal">
+        Preguntas<br><span class="font-extralight italic text-ink-muted">frecuentes</span>
+      </h2>
+      <div class="max-w-xl" id="faqList">
+        <div class="faq-item border-t border-black/[.06] reveal">
+          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
+            <span class="font-semibold text-base">¿Cuánto cuesta un tatuaje?</span>
+            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
+          </button>
+          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
+            El precio varía según tamaño, detalle y ubicación. Escríbenos para un presupuesto personalizado sin compromiso.
+          </div>
+        </div>
+        <div class="faq-item border-t border-black/[.06] reveal" style="transition-delay:.05s">
+          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
+            <span class="font-semibold text-base">¿Necesito cita previa?</span>
+            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
+          </button>
+          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
+            Sí. Trabajamos con cita para garantizar el tiempo y la atención que cada proyecto merece.
+          </div>
+        </div>
+        <div class="faq-item border-t border-black/[.06] reveal" style="transition-delay:.1s">
+          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
+            <span class="font-semibold text-base">¿Duele?</span>
+            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
+          </button>
+          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
+            Varía según la zona, pero es completamente tolerable. La mayoría lo describe como un rasguño continuo.
+          </div>
+        </div>
+        <div class="faq-item border-t border-black/[.06] reveal" style="transition-delay:.15s">
+          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
+            <span class="font-semibold text-base">¿Cuánto tarda en sanar?</span>
+            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
+          </button>
+          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
+            Recuperación completa: 2–4 semanas. Los primeros 10 días son los más críticos.
+          </div>
+        </div>
+        <div class="faq-item border-t border-t-black/[.06] border-b border-black/[.06] reveal" style="transition-delay:.2s">
+          <button class="w-full flex justify-between items-center py-5 text-left" onclick="toggleFaq(this)">
+            <span class="font-semibold text-base">¿Puedo traer mi diseño?</span>
+            <span class="faq-icon text-2xl font-light text-ink-muted ml-4 flex-shrink-0">+</span>
+          </button>
+          <div class="faq-body text-ink-muted font-light text-sm leading-relaxed">
+            Por supuesto. También podemos crear diseños completamente originales para ti.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTACT ── -->
+  <section id="contact" class="py-32 px-6 bg-ink overflow-hidden relative">
+    <div class="absolute inset-0 opacity-[.04]"
+         style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;"></div>
+    <div class="max-w-5xl mx-auto relative z-10">
+      <div class="grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="font-black text-[clamp(3rem,9vw,6rem)] leading-[.9] tracking-tight text-white mb-6 reveal">
+            Hagamos<br>
+            <span class="font-extralight italic text-white/35">algo grande.</span>
+          </h2>
+          <p class="text-white/50 font-light text-lg leading-relaxed mb-10 reveal">
+            Tu idea merece un artista que la entienda. Cuéntanos qué tienes en mente.
+          </p>
+          <a href="https://wa.me/1234567890?text=Hola!%20Quiero%20información%20sobre%20tatuajes"
+             target="_blank"
+             class="btn-red px-8 py-4 text-sm inline-flex items-center gap-2 reveal">
+            Escribir por WhatsApp
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <div class="space-y-8 reveal">
+          <div class="border-b border-white/10 pb-8">
+            <p class="text-white/30 text-[.65rem] font-semibold tracking-[.45em] uppercase mb-1">WhatsApp</p>
+            <p class="text-white font-semibold text-xl">+34 123 456 789</p>
+          </div>
+          <div class="border-b border-white/10 pb-8">
+            <p class="text-white/30 text-[.65rem] font-semibold tracking-[.45em] uppercase mb-1">Horario</p>
+            <p class="text-white font-semibold text-xl">Lun–Sáb, 10h a 20h</p>
+          </div>
+          <div>
+            <p class="text-white/30 text-[.65rem] font-semibold tracking-[.45em] uppercase mb-1">Ubicación</p>
+            <p class="text-white font-semibold text-xl">Calle Ejemplo 123, Ciudad</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 px-6 bg-surface border-t border-black/[.05]">
+    <div class="max-w-5xl mx-auto flex justify-between items-center flex-wrap gap-4">
+      <p class="font-black text-lg tracking-tight">INK STUDIO</p>
+      <p class="text-ink-muted text-xs font-light tracking-wider">© 2025 · Arte permanente</p>
+    </div>
+  </footer>
+
+</div><!-- /app -->
+
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999]
+     glass-dark text-white text-xs font-medium tracking-wide px-5 py-3 rounded-full
+     opacity-0 translate-y-4 pointer-events-none whitespace-nowrap">
+</div>
+
+
+<script>
+/* ── GREETINGS ── */
+const G_FIRST = [
+  "Bienvenido a Ink Studio.",
+  "Qué bueno que estás aquí.",
+  "Tu historia comienza hoy.",
+  "Listos para conocerte.",
+];
+const G_RETURN = [
+  "¿De vuelta? Qué bueno verte.",
+  "Sabíamos que volverías.",
+  "Tu artista ya te está esperando.",
+  "Seguimos donde lo dejamos.",
+  "Bienvenido de nuevo. ✦",
+  "Nos alegra verte otra vez.",
+  "Tu próximo tatuaje te llama.",
+  "Aquí estamos, siempre.",
+  "¿Listo para dar el siguiente paso?",
+  "El arte no espera. Ni tú tampoco.",
+  "De vuelta al estudio. Perfecto.",
+  "¿Ya decidiste la zona?",
+  "Cada visita, más cerca del diseño ideal.",
+  "Tu lienzo sigue esperando.",
+  "El mejor tatuaje es el próximo.",
+  "Hola de nuevo, ¿en qué te ayudamos?",
+  "Nos recuerdas. Te recordamos.",
+  "La tinta tiene memoria. Tú también.",
+  "¿Qué historia contaremos hoy?",
+  "Bienvenido al lugar donde las ideas se vuelven permanentes.",
+];
+
+/* ── STATE ── */
+let state = {};
+function loadState() { try { state = JSON.parse(localStorage.getItem('ink_v6')||'{}'); } catch(e){} }
+function saveState() { localStorage.setItem('ink_v6', JSON.stringify(state)); }
+
+let answers = [null,null,null,null];
+
+/* ── TOAST ── */
+function showToast(msg, dur=3200) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('opacity-0','translate-y-4');
+  t.classList.add('opacity-100','translate-y-0');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => {
+    t.classList.add('opacity-0','translate-y-4');
+    t.classList.remove('opacity-100','translate-y-0');
+  }, dur);
+}
+
+/* ── STATUS ── */
+function updateStatus() {
+  const n=new Date(), d=n.getDay(), t=n.getHours()+n.getMinutes()/60;
+  const open = (d>=1&&d<=5&&t>=10&&t<20)||(d===6&&t>=10&&t<18);
+  document.getElementById('navStatus').className =
+    'flex items-center gap-2 pill px-4 py-1.5' + (open ? '' : ' border-red/30');
+  document.getElementById('navDot').style.background = open ? '#34C759' : '#FF3B30';
+  document.getElementById('navStatusText').textContent = open ? 'Abierto ahora' : 'Cerrado';
+}
+
+/* ── QUIZ ── */
+function selectOpt(el, step) {
+  document.querySelectorAll(`[data-q="${step}"]`).forEach(o => o.classList.remove('chosen'));
+  el.classList.add('chosen');
+  answers[step] = el.dataset.v;
+  const btn = document.getElementById('qnext'+step);
+  if (btn) {
+    btn.classList.remove('opacity-0','pointer-events-none');
+    btn.classList.add('opacity-100');
+  }
+}
+
+function nextStep(to) {
+  if (answers[to-1] === null) return;
+  const from = document.getElementById('qs'+(to-1));
+  from.style.opacity = '0';
+  from.style.transform = 'translateY(-16px)';
+  from.style.transition = 'all .35s cubic-bezier(.16,1,.3,1)';
+  setTimeout(() => {
+    from.classList.add('hidden');
+    from.style.opacity = '';
+    from.style.transform = '';
+    const next = document.getElementById('qs'+to);
+    next.classList.remove('hidden');
+    next.style.opacity = '0';
+    next.style.transform = 'translateY(24px)';
+    next.style.transition = 'none';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        next.style.transition = 'all .5s cubic-bezier(.16,1,.3,1)';
+        next.style.opacity = '1';
+        next.style.transform = 'translateY(0)';
+      });
+    });
+  }, 280);
+}
+
+function showResult() {
+  if (answers[3] === null) return;
+  const from = document.getElementById('qs3');
+  from.style.opacity = '0';
+  from.style.transform = 'translateY(-16px)';
+  from.style.transition = 'all .35s cubic-bezier(.16,1,.3,1)';
+  setTimeout(() => {
+    from.classList.add('hidden');
+    const res = document.getElementById('quizResult');
+    res.classList.remove('hidden');
+    res.style.opacity = '0';
+    res.style.transform = 'scale(.95)';
+    res.style.transition = 'none';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      res.style.transition = 'all .5s cubic-bezier(.16,1,.3,1)';
+      res.style.opacity = '1';
+      res.style.transform = 'scale(1)';
+    }));
+
+    const zM={cabeza:'Cabeza',cuello:'Cuello',torso:'Torso',brazo:'Brazo',pierna:'Pierna',espalda:'Espalda'};
+    const sM={realismo:'Realismo',oldschool:'Old School',blackwork:'Blackwork',geometrico:'Geométrico'};
+    const szM={pequeno:'Pequeño',mediano:'Mediano',grande:'Grande'};
+    const isFirst = answers[0]==='first';
+
+    document.getElementById('resultTitle').textContent = isFirst ? 'Todo listo.' : 'Bienvenido de vuelta.';
+    document.getElementById('resultSub').textContent = isFirst
+      ? `Un ${sM[answers[2]]||''} en ${zM[answers[1]]||''}, tamaño ${szM[answers[3]]||''}. Perfecto punto de partida.`
+      : `Zona: ${zM[answers[1]]||''}. Estilo: ${sM[answers[2]]||''}. Ya sabemos lo que necesitas.`;
+
+    const tags = document.getElementById('resultTags');
+    tags.innerHTML = '';
+    [zM[answers[1]], sM[answers[2]], szM[answers[3]]].filter(Boolean).forEach(t => {
+      const d = document.createElement('span');
+      d.className = 'pill px-4 py-1.5 text-xs font-medium';
+      d.textContent = t;
+      tags.appendChild(d);
+    });
+
+    state.completed = true;
+    state.answers = answers;
+    saveState();
+  }, 280);
+}
+
+function enterApp() {
+  document.getElementById('quiz').classList.remove('opacity-100','pointer-events-all');
+  document.getElementById('quiz').classList.add('opacity-0','pointer-events-none');
+  setTimeout(() => showApp(), 450);
+}
+
+/* ── APP ── */
+function showApp() {
+  const app = document.getElementById('app');
+  app.classList.remove('opacity-0');
+  app.classList.add('opacity-100');
+  initScroll();
+  // run hero animations
+  document.querySelectorAll('.anim-fade.paused').forEach(el => {
+    el.classList.remove('paused');
+    el.classList.add('running');
+  });
+  const greet = state.answers?.[0]==='returning'
+    ? G_RETURN[Math.floor(Math.random()*G_RETURN.length)]
+    : 'Bienvenido al estudio.';
+  setTimeout(() => showToast(greet), 900);
+}
+
+/* ── SCROLL REVEAL ── */
+function initScroll() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    io.observe(el);
+  });
+}
+
+/* ── FAQ ── */
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('faq-open');
+  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('faq-open'));
+  if (!wasOpen) item.classList.add('faq-open');
+}
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  window.scrollY > 40 ? nav.classList.add('nav-scrolled') : nav.classList.remove('nav-scrolled');
+}, { passive: true });
+
+/* ── SMOOTH SCROLL ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  });
+});
+
+/* ── INIT ── */
+function init() {
+  loadState();
+  updateStatus();
+  setInterval(updateStatus, 60000);
+
+  const isReturning = !!state.completed;
+  const greet = isReturning
+    ? G_RETURN[Math.floor(Math.random()*G_RETURN.length)]
+    : G_FIRST[Math.floor(Math.random()*G_FIRST.length)];
+
+  document.getElementById('splashGreet').textContent = greet;
+
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('out');
+    setTimeout(() => {
+      if (isReturning) {
+        showApp();
+        setTimeout(() => showToast(greet), 800);
+      } else {
+        const quiz = document.getElementById('quiz');
+        quiz.classList.remove('opacity-0','pointer-events-none');
+        quiz.classList.add('opacity-100','pointer-events-all');
+        document.getElementById('qs0').classList.remove('hidden');
+      }
+    }, 700);
+  }, 2600);
+}
+
+window.addEventListener('DOMContentLoaded', init);
+window.resetProgress = () => { localStorage.removeItem('ink_v6'); location.reload(); };
+</script>
 </body>
-                                    </html>
+    </html>
